@@ -1,0 +1,80 @@
+:root {
+  --text-display: clamp(2.8rem, 4.2vw, 4.5rem);
+  --text-h1: clamp(2.5rem, 4.4vw, 4.5rem);
+  --text-h2: clamp(2rem, 3vw, 3.25rem);
+  --text-h3: clamp(1.35rem, 2vw, 1.9rem);
+  --text-lead: clamp(1.05rem, 1.3vw, 1.25rem);
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+}
+
+.display,
+.heading-1,
+.heading-2,
+.heading-3,
+.eyebrow {
+  font-family: var(--font-display);
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+.display {
+  font-size: var(--text-display);
+  font-weight: 750;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.heading-1 {
+  font-size: var(--text-h1);
+  font-weight: 740;
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+}
+
+.heading-2 {
+  font-size: var(--text-h2);
+  font-weight: 720;
+  line-height: 1.18;
+  letter-spacing: -0.032em;
+}
+
+.heading-3 {
+  font-size: var(--text-h3);
+  font-weight: 680;
+  line-height: 1.28;
+  letter-spacing: -0.025em;
+}
+
+.lead {
+  color: var(--color-ink-soft);
+  font-size: var(--text-lead);
+  line-height: 1.75;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-primary-700);
+  font-size: 0.88rem;
+  font-weight: 690;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.eyebrow::after {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent-500);
+  content: "";
+}
+
+@media (max-width: 640px) {
+  :root {
+    --text-display: clamp(2.35rem, 12vw, 3.4rem);
+    --text-h1: clamp(2.15rem, 10vw, 3rem);
+  }
+}

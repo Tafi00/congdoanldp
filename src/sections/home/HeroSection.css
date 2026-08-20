@@ -1,0 +1,240 @@
+.hero {
+  position: relative;
+  min-height: calc(100svh - var(--header-height));
+  overflow: hidden;
+  background-color: var(--color-primary-50);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  isolation: isolate;
+}
+
+.hero::after {
+  position: absolute;
+  z-index: -1;
+  right: -5%;
+  bottom: -10%;
+  width: 52%;
+  height: 62%;
+  border-radius: 50%;
+  background: rgb(8 107 215 / 8%);
+  filter: blur(80px);
+  content: "";
+}
+
+.hero__inner {
+  display: grid;
+  min-height: calc(100svh - var(--header-height));
+  grid-template-columns: minmax(0, 0.95fr) minmax(520px, 1.05fr);
+  align-items: center;
+  gap: clamp(24px, 3vw, 64px);
+  padding-block: clamp(54px, 7vh, 96px) clamp(76px, 9vh, 116px);
+}
+
+.hero__content {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+}
+
+.hero__kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 28px;
+  color: var(--color-primary-700);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 650;
+  letter-spacing: 0.065em;
+  text-transform: uppercase;
+}
+
+.hero__kicker i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent-500);
+}
+
+.hero__title {
+  max-width: 760px;
+  margin: 0;
+}
+
+.hero__description {
+  max-width: 640px;
+  margin: 28px 0 0;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 34px;
+}
+
+.hero__trust {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-top: 42px;
+  color: var(--color-primary-700);
+  font-weight: 560;
+}
+
+.hero__trust-icon {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  flex: 0 0 50px;
+  place-items: center;
+  border: 1px solid rgb(7 88 187 / 10%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 70%);
+  box-shadow: var(--shadow-xs);
+}
+
+.hero__visual {
+  position: relative;
+  z-index: 1;
+  align-self: end;
+  min-width: 0;
+}
+
+.hero__people {
+  position: relative;
+  z-index: 2;
+  width: min(860px, 59vw);
+  max-width: none;
+  margin-left: -4%;
+  filter: drop-shadow(0 28px 34px rgb(4 42 91 / 12%));
+}
+
+.hero__orb {
+  position: absolute;
+  z-index: 1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero__orb--one {
+  top: 9%;
+  right: 6%;
+  width: 86px;
+  height: 86px;
+  border: 1px solid rgb(21 153 237 / 20%);
+  background: rgb(255 255 255 / 40%);
+}
+
+.hero__orb--two {
+  right: 2%;
+  bottom: 20%;
+  width: 34px;
+  height: 34px;
+  background: var(--color-accent-400);
+  box-shadow: 0 14px 35px rgb(246 185 31 / 28%);
+}
+
+.hero__scroll {
+  position: absolute;
+  z-index: 3;
+  bottom: 24px;
+  left: 50%;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgb(7 88 187 / 18%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 72%);
+  color: var(--color-primary-700);
+  transform: translateX(-50%);
+  transition: transform 220ms var(--ease-out);
+  backdrop-filter: blur(8px);
+}
+
+.hero__scroll:hover {
+  transform: translate(-50%, 3px);
+}
+
+@media (max-width: 1200px) {
+  .hero__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(450px, 0.9fr);
+  }
+
+  .hero__people {
+    width: min(780px, 61vw);
+    margin-left: -10%;
+  }
+}
+
+@media (max-width: 920px) {
+  .hero {
+    min-height: auto;
+    background-position: 39% center;
+  }
+
+  .hero__inner {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    padding-top: 72px;
+    padding-bottom: 0;
+  }
+
+  .hero__content {
+    max-width: 760px;
+  }
+
+  .hero__visual {
+    width: min(760px, 100%);
+    margin: 10px auto 0;
+  }
+
+  .hero__people {
+    width: 108%;
+    margin: 0 -4%;
+  }
+
+  .hero__scroll {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero__inner {
+    padding-top: 48px;
+  }
+
+  .hero__kicker {
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+    font-size: 0.74rem;
+  }
+
+  .hero__title br {
+    display: none;
+  }
+
+  .hero__description {
+    margin-top: 20px;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .hero__actions {
+    display: grid;
+    margin-top: 28px;
+  }
+
+  .hero__trust {
+    align-items: flex-start;
+    margin-top: 28px;
+    font-size: 0.9rem;
+  }
+
+  .hero__people {
+    width: 118%;
+    margin-left: -9%;
+  }
+}
