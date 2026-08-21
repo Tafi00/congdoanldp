@@ -28,13 +28,14 @@
   grid-template-columns: minmax(0, 1.1fr) minmax(500px, 0.9fr);
   align-items: center;
   gap: clamp(24px, 3vw, 64px);
-  padding-block: clamp(54px, 7vh, 96px) clamp(76px, 9vh, 116px);
+  padding-block: clamp(54px, 7vh, 96px) 0;
 }
 
 .hero__content {
   position: relative;
   z-index: 2;
   max-width: 720px;
+  padding-bottom: clamp(76px, 9vh, 116px);
 }
 
 .hero__kicker {
@@ -185,6 +186,7 @@
 
   .hero__content {
     max-width: 760px;
+    padding-bottom: 0;
   }
 
   .hero__visual {
