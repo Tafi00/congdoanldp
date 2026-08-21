@@ -179,14 +179,19 @@ export function NewsPage() {
           <p className="info-crumb">
             <Link to="/">Trang chủ</Link> <span>/</span> <b>Tin tức</b>
           </p>
-          <div className="news-hero__copy">
-            <p className="info-kicker">TIN TỨC & THÔNG BÁO</p>
-            <h1>Cập nhật thông tin từ nhà trường</h1>
-            <p>
-              Theo dõi thông báo tuyển sinh, hoạt động bồi dưỡng
-              <br />
-              và thông tin chuyên môn.
-            </p>
+          <div className="news-hero__main">
+            <div className="news-hero__copy">
+              <p className="info-kicker">TIN TỨC & THÔNG BÁO</p>
+              <h1>Cập nhật thông tin từ nhà trường</h1>
+              <p>
+                Theo dõi thông báo tuyển sinh, hoạt động bồi dưỡng
+                <br />
+                và thông tin chuyên môn.
+              </p>
+            </div>
+            <div className="news-hero__visual" aria-hidden="true">
+              <img src={assets.newsFeatureEnrollment} alt="" />
+            </div>
           </div>
           <article className="featured-strip">
             <div>
