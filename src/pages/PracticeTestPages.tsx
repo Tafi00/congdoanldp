@@ -135,17 +135,29 @@ export function PracticeBankPage() {
             </p>
           </div>
           <div className="latest-result">
-            <h2>
-              Kết quả gần nhất <BarChart3 />
-            </h2>
-            <div>
-              <strong>
+            <div className="latest-result__head">
+              <span>
+                <small>Lần thi gần nhất</small>
+                <h2>Kết quả của bạn</h2>
+              </span>
+              <i>
+                <BarChart3 />
+              </i>
+            </div>
+            <div className="latest-result__body">
+              <strong className="latest-result__score">
                 32<small>/40</small>
               </strong>
-              <span />
-              <Link to="/thi-thu/nghiep-vu-cong-doan-01/ket-qua">
-                Xem lịch sử <ArrowRight />
-              </Link>
+              <div className="latest-result__summary">
+                <span>
+                  <CheckCircle2 /> Hoàn thành tốt
+                </span>
+                <b>Nghiệp vụ công đoàn</b>
+                <p>Đúng 80% tổng số câu hỏi</p>
+                <Link to="/thi-thu/nghiep-vu-cong-doan-01/ket-qua">
+                  Xem lịch sử <ArrowRight />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
