@@ -1,5 +1,6 @@
 import { Check, ChevronRight, LockKeyhole } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { assets } from "../../data/assets";
 import { CustomSelect } from "../../components/ui/CustomSelect";
 import { fadeUp, stagger, viewportOnce } from "../../lib/motion";
@@ -18,6 +19,7 @@ const steps = [
 ];
 
 export function RegistrationSection() {
+  const navigate = useNavigate();
   return (
     <section
       id="dang-ky-nhanh"
@@ -57,7 +59,14 @@ export function RegistrationSection() {
             </ul>
           </motion.div>
 
-          <motion.form className="registration-form" variants={fadeUp}>
+          <motion.form
+            className="registration-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              navigate("/dang-ky-thanh-cong");
+            }}
+            variants={fadeUp}
+          >
             <h3 className="heading-3">Thông tin đăng ký</h3>
             <label>
               <span>Chương trình quan tâm</span>
@@ -78,6 +87,7 @@ export function RegistrationSection() {
                 type="text"
                 placeholder="Nhập họ và tên"
                 autoComplete="name"
+                required
               />
             </label>
             <label>
@@ -86,13 +96,14 @@ export function RegistrationSection() {
                 type="tel"
                 placeholder="Nhập số điện thoại"
                 autoComplete="tel"
+                required
               />
             </label>
             <label>
               <span>Đơn vị công tác</span>
-              <input type="text" placeholder="Nhập đơn vị công tác" />
+              <input type="text" placeholder="Nhập đơn vị công tác" required />
             </label>
-            <motion.button whileTap={{ scale: 0.985 }} type="button">
+            <motion.button whileTap={{ scale: 0.985 }} type="submit">
               Gửi đăng ký
             </motion.button>
             <p className="registration-form__security">

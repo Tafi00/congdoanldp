@@ -25,7 +25,7 @@
 .hero__inner {
   display: grid;
   min-height: calc(100svh - var(--header-height));
-  grid-template-columns: minmax(0, 0.95fr) minmax(520px, 1.05fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(500px, 0.9fr);
   align-items: center;
   gap: clamp(24px, 3vw, 64px);
   padding-block: clamp(54px, 7vh, 96px) clamp(76px, 9vh, 116px);
@@ -60,6 +60,7 @@
 .hero__title {
   max-width: 760px;
   margin: 0;
+  font-size: clamp(2.8rem, 3.65vw, 3.9rem);
 }
 
 .hero__description {
@@ -160,7 +161,7 @@
 
 @media (max-width: 1200px) {
   .hero__inner {
-    grid-template-columns: minmax(0, 1fr) minmax(450px, 0.9fr);
+    grid-template-columns: minmax(0, 1.08fr) minmax(430px, 0.92fr);
   }
 
   .hero__people {

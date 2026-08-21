@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Bell,
   CheckCircle2,
@@ -20,6 +21,7 @@ const steps = [
 ];
 
 export function OnlineApplicationSection() {
+  const [fileName, setFileName] = useState("bang-cap.pdf");
   return (
     <section
       id="nop-ho-so"
@@ -96,7 +98,15 @@ export function OnlineApplicationSection() {
             />
           </label>
           <label className="application-upload">
-            <input className="sr-only" type="file" />
+            <input
+              accept=".pdf,.jpg,.jpeg,.png"
+              className="sr-only"
+              onChange={(event) => {
+                const selectedFile = event.target.files?.[0];
+                if (selectedFile) setFileName(selectedFile.name);
+              }}
+              type="file"
+            />
             <FileText size={52} />
             <Upload className="application-upload__badge" size={22} />
             <b>Kéo thả hồ sơ vào đây</b>
@@ -105,7 +115,7 @@ export function OnlineApplicationSection() {
           </label>
           <div className="application-file">
             <FileText size={25} />
-            <span>bang-cap.pdf</span>
+            <span>{fileName}</span>
             <b>Đã tải lên</b>
             <CheckCircle2 size={22} />
           </div>

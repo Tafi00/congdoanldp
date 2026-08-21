@@ -1,6 +1,7 @@
 import logo from "../../assets/generated/optimized/logo.webp";
 import heroBackground from "../../assets/generated/optimized/backgrounds/hero-background.webp";
 import heroEducators from "../../assets/generated/optimized/illustrations/hero-educators-cutout.webp";
+import brandSwooshDecoration from "../../assets/generated/optimized/illustrations/brand-swoosh-decoration.webp";
 import lightSectionBackground from "../../assets/generated/optimized/backgrounds/light-section-background.webp";
 import registrationSectionBackground from "../../assets/generated/optimized/backgrounds/registration-section-background.webp";
 import ctaBannerBackground from "../../assets/generated/optimized/backgrounds/cta-banner-background.webp";
@@ -17,6 +18,7 @@ export const assets = {
   logo,
   heroBackground,
   heroEducators,
+  brandSwooshDecoration,
   lightSectionBackground,
   registrationSectionBackground,
   ctaBannerBackground,

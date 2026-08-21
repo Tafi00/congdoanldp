@@ -1,5 +1,5 @@
 .about-programs {
-  padding-block: var(--section-space);
+  padding-block: clamp(64px, 6vw, 92px);
   background-color: var(--color-surface-soft);
   background-position: center;
   background-repeat: no-repeat;
@@ -77,10 +77,13 @@
 }
 
 .metric-card strong {
+  width: max-content;
+  max-width: 100%;
   color: var(--color-primary-700);
   font-family: var(--font-display);
-  font-size: clamp(1.45rem, 2vw, 2rem);
+  font-size: clamp(1.4rem, 1.8vw, 1.9rem);
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .metric-card > span:last-child {
@@ -90,7 +93,7 @@
 }
 
 .featured-programs {
-  margin-top: clamp(64px, 8vw, 100px);
+  margin-top: clamp(54px, 5vw, 74px);
 }
 
 .featured-programs__label {
@@ -111,7 +114,7 @@
 .program-card {
   position: relative;
   display: flex;
-  min-height: 410px;
+  min-height: 395px;
   overflow: hidden;
   flex-direction: column;
   align-items: center;
@@ -144,6 +147,17 @@
   transform: translateX(-50%);
 }
 
+.program-card__swoosh {
+  position: absolute;
+  right: -52px;
+  bottom: -150px;
+  width: 190px;
+  height: 260px;
+  object-fit: contain;
+  pointer-events: none;
+  transform: rotate(8deg);
+}
+
 .program-card__icon {
   width: 78px;
   height: 78px;
@@ -174,6 +188,8 @@
 }
 
 .program-card__link {
+  position: relative;
+  z-index: 1;
   display: flex;
   width: calc(100% + 64px);
   min-height: 62px;

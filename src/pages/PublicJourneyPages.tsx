@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
@@ -16,14 +16,12 @@ import {
   Info,
   Landmark,
   LockKeyhole,
-  MapPin,
   MonitorUp,
   Search,
   UserRound,
   Users,
 } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
-import { Button } from "../components/ui/Button";
 import { CustomSelect } from "../components/ui/CustomSelect";
 import { assets } from "../data/assets";
 import "./PublicJourneyPages.css";
@@ -31,23 +29,35 @@ import "./PublicJourneyPages.css";
 const programs = [
   {
     slug: "nghiep-vu-cong-doan",
+    category: "union",
     icon: Users,
     title: "Nghiệp vụ công đoàn",
     text: "Bồi dưỡng kỹ năng tổ chức, quản lý và hoạt động công đoàn.",
   },
   {
     slug: "nghiep-vu-su-pham",
+    category: "pedagogy",
     icon: BookOpen,
     title: "Nghiệp vụ sư phạm",
     text: "Cập nhật phương pháp giảng dạy và năng lực nghề nghiệp.",
   },
   {
     slug: "quan-ly-giao-duc",
+    category: "management",
     icon: GraduationCap,
     title: "Quản lý giáo dục",
     text: "Nâng cao năng lực quản trị cho cán bộ quản lý giáo dục.",
   },
 ];
+
+const programCategories = [
+  { value: "all", label: "Tất cả" },
+  { value: "union", label: "Công đoàn" },
+  { value: "pedagogy", label: "Sư phạm" },
+  { value: "management", label: "Quản lý giáo dục" },
+];
+
+const programsPerPage = 2;
 
 function Field({
   label,
@@ -69,32 +79,58 @@ function Field({
 function Steps({
   active = 1,
   complete = false,
+  labels = ["Chương trình", "Thông tin cá nhân", "Xác nhận"],
 }: {
   active?: number;
   complete?: boolean;
+  labels?: [string, string, string];
 }) {
   return (
     <div className={`mock-steps ${complete ? "is-complete" : ""}`}>
-      {[
-        [1, "Chương trình"],
-        [2, "Thông tin cá nhân"],
-        [3, "Xác nhận"],
-      ].map(([n, label], i) => (
-        <div className={complete || n === active ? "active" : ""} key={label}>
-          <strong>{String(n).padStart(2, "0")}</strong>
-          <span>{label}</span>
-          {i < 2 && <i />}
-        </div>
-      ))}
+      {labels.map((label, i) => {
+        const n = i + 1;
+        return (
+          <div className={complete || n === active ? "active" : ""} key={label}>
+            <strong>{String(n).padStart(2, "0")}</strong>
+            <span>{label}</span>
+            {i < 2 && <i />}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
 export function ProgramsPage() {
   const [query, setQuery] = useState("");
-  const shown = programs.filter((p) =>
-    p.title.toLowerCase().includes(query.toLowerCase()),
+  const [category, setCategory] = useState("all");
+  const [sort, setSort] = useState("newest");
+  const [page, setPage] = useState(1);
+
+  const filteredPrograms = programs
+    .filter(
+      (program) =>
+        (category === "all" || program.category === category) &&
+        program.title.toLowerCase().includes(query.trim().toLowerCase()),
+    )
+    .sort((first, second) => {
+      if (sort === "name") return first.title.localeCompare(second.title, "vi");
+      if (sort === "popular") return second.title.length - first.title.length;
+      return 0;
+    });
+  const pageCount = Math.max(
+    1,
+    Math.ceil(filteredPrograms.length / programsPerPage),
   );
+  const shown = filteredPrograms.slice(
+    (page - 1) * programsPerPage,
+    page * programsPerPage,
+  );
+
+  const selectCategory = (value: string) => {
+    setCategory(value);
+    setPage(1);
+  };
   return (
     <>
       <PageHero
@@ -110,20 +146,34 @@ export function ProgramsPage() {
               <Search size={19} />
               <input
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setPage(1);
+                }}
                 placeholder="Tìm kiếm chương trình"
               />
             </label>
-            <nav>
-              <button className="active">Tất cả</button>
-              <button>Công đoàn</button>
-              <button>Sư phạm</button>
-              <button>Quản lý giáo dục</button>
+            <nav aria-label="Lọc chương trình theo lĩnh vực">
+              {programCategories.map((item) => (
+                <button
+                  aria-pressed={category === item.value}
+                  className={category === item.value ? "active" : ""}
+                  key={item.value}
+                  onClick={() => selectCategory(item.value)}
+                  type="button"
+                >
+                  {item.label}
+                </button>
+              ))}
             </nav>
             <CustomSelect
               className="custom-select--compact"
               ariaLabel="Sắp xếp chương trình"
-              defaultValue="newest"
+              value={sort}
+              onValueChange={(value) => {
+                setSort(value);
+                setPage(1);
+              }}
               options={[
                 { value: "newest", label: "Mới nhất" },
                 { value: "popular", label: "Phổ biến nhất" },
@@ -166,14 +216,36 @@ export function ProgramsPage() {
                 </div>
               </article>
             ))}
+            {shown.length === 0 && (
+              <p className="program-list-empty">
+                Không tìm thấy chương trình phù hợp.
+              </p>
+            )}
           </div>
-          <div className="mock-pagination">
-            <button className="active">01</button>
-            <button>02</button>
-            <button>
+          <nav className="mock-pagination" aria-label="Phân trang chương trình">
+            {Array.from({ length: pageCount }, (_, index) => index + 1).map(
+              (pageNumber) => (
+                <button
+                  aria-current={page === pageNumber ? "page" : undefined}
+                  className={page === pageNumber ? "active" : ""}
+                  key={pageNumber}
+                  onClick={() => setPage(pageNumber)}
+                  type="button"
+                >
+                  {String(pageNumber).padStart(2, "0")}
+                </button>
+              ),
+            )}
+            <button
+              disabled={page === pageCount}
+              onClick={() =>
+                setPage((current) => Math.min(current + 1, pageCount))
+              }
+              type="button"
+            >
               Tiếp theo <ArrowRight size={17} />
             </button>
-          </div>
+          </nav>
         </div>
       </section>
     </>
@@ -183,6 +255,8 @@ export function ProgramsPage() {
 export function ProgramDetailPage() {
   const { slug } = useParams();
   const program = programs.find((p) => p.slug === slug) || programs[0];
+  const [activeTab, setActiveTab] = useState("Tổng quan");
+  const detailTabs = ["Tổng quan", "Nội dung", "Đối tượng", "Cách đăng ký"];
   return (
     <>
       <section
@@ -248,43 +322,76 @@ export function ProgramDetailPage() {
       <section className="program-detail-body">
         <div className="container">
           <nav className="detail-tabs">
-            <button className="active">Tổng quan</button>
-            <button>Nội dung</button>
-            <button>Đối tượng</button>
-            <button>Cách đăng ký</button>
+            {detailTabs.map((tab) => (
+              <button
+                aria-pressed={activeTab === tab}
+                className={activeTab === tab ? "active" : ""}
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                type="button"
+              >
+                {tab}
+              </button>
+            ))}
           </nav>
-          <div className="detail-overview-grid">
-            <article>
-              <span>
-                <BookOpen size={34} />
-              </span>
-              <div>
-                <h2>Tổng quan</h2>
+          {activeTab === "Tổng quan" ? (
+            <div className="detail-overview-grid">
+              <article>
+                <span>
+                  <BookOpen size={34} />
+                </span>
+                <div>
+                  <h2>Tổng quan</h2>
+                  <p>
+                    Chương trình tập trung vào năng lực thực hành, giúp học viên
+                    vận dụng hiệu quả nghiệp vụ công đoàn trong môi trường giáo
+                    dục.
+                  </p>
+                </div>
+              </article>
+              <article>
+                <h2>Nội dung bồi dưỡng</h2>
+                {[
+                  "Vai trò và chức năng công đoàn",
+                  "Tổ chức hoạt động công đoàn",
+                  "Kỹ năng đại diện và hỗ trợ",
+                  "Quản lý theo ngành",
+                ].map((x) => (
+                  <p key={x}>
+                    <span>
+                      <GraduationCap size={20} />
+                      {x}
+                    </span>
+                    <ArrowRight size={17} />
+                  </p>
+                ))}
+              </article>
+            </div>
+          ) : (
+            <article className="detail-tab-panel">
+              <h2>{activeTab}</h2>
+              {activeTab === "Nội dung" && (
+                <ul>
+                  <li>Vai trò và chức năng công đoàn</li>
+                  <li>Tổ chức hoạt động công đoàn</li>
+                  <li>Kỹ năng đại diện và hỗ trợ</li>
+                  <li>Quản lý theo ngành</li>
+                </ul>
+              )}
+              {activeTab === "Đối tượng" && (
                 <p>
-                  Chương trình tập trung vào năng lực thực hành, giúp học viên
-                  vận dụng hiệu quả nghiệp vụ công đoàn trong môi trường giáo
-                  dục.
+                  Chương trình dành cho cán bộ công đoàn, công chức, viên chức,
+                  giáo viên và cán bộ quản lý trong ngành giáo dục.
                 </p>
-              </div>
-            </article>
-            <article>
-              <h2>Nội dung bồi dưỡng</h2>
-              {[
-                "Vai trò và chức năng công đoàn",
-                "Tổ chức hoạt động công đoàn",
-                "Kỹ năng đại diện và hỗ trợ",
-                "Quản lý theo ngành",
-              ].map((x) => (
-                <p key={x}>
-                  <span>
-                    <GraduationCap size={20} />
-                    {x}
-                  </span>
-                  <ArrowRight size={17} />
+              )}
+              {activeTab === "Cách đăng ký" && (
+                <p>
+                  Chọn chương trình, điền thông tin đăng ký và hoàn thiện hồ sơ
+                  trực tuyến. Bộ phận tuyển sinh sẽ liên hệ xác nhận lịch học.
                 </p>
-              ))}
+              )}
             </article>
-          </div>
+          )}
         </div>
       </section>
     </>
@@ -452,6 +559,17 @@ export function RegistrationSuccessPage() {
 }
 
 export function ApplicationFormPage() {
+  const navigate = useNavigate();
+  const documentLabels = [
+    "Phiếu đăng ký",
+    "Văn bằng hoặc chứng chỉ",
+    "Giấy tờ tùy thân",
+  ];
+  const [uploadedDocuments, setUploadedDocuments] = useState<(string | null)[]>(
+    ["phieu-dang-ky.pdf", "van-bang.pdf", null],
+  );
+  const completedDocuments = uploadedDocuments.filter(Boolean).length;
+
   return (
     <>
       <PageHero
@@ -461,43 +579,67 @@ export function ApplicationFormPage() {
         current="Nộp hồ sơ trực tuyến"
       />
       <section className="wizard-section">
-        <div className="container wizard-layout">
+        <div className="container wizard-layout application-layout">
           <form className="wizard-card application-wizard">
-            <Steps active={2} />
+            <Steps active={2} labels={["Thông tin", "Tài hồ sơ", "Xác nhận"]} />
             <div className="application-code">
               <FileText />
               Hồ sơ: <b>HS-2026-001</b>
             </div>
             <h2>Tài liệu hồ sơ</h2>
-            {[
-              ["Phiếu đăng ký", "phieu-dang-ky.pdf", true],
-              ["Văn bằng hoặc chứng chỉ", "van-bang.pdf", true],
-              ["Giấy tờ tùy thân", "", false],
-            ].map(([label, file, done]) => (
-              <div className="document-row" key={label as string}>
-                <div>
-                  <b>{label as string}</b>
-                  <small>PDF, JPG, PNG • Tối đa 10 MB</small>
-                </div>
-                {done ? (
-                  <div className="uploaded-file">
-                    <FileText />
-                    <span>{file as string}</span>
-                    <b>Đã tải lên</b>
-                    <CheckCircle2 />
-                    <button>×</button>
+            {documentLabels.map((label, index) => {
+              const file = uploadedDocuments[index];
+              return (
+                <div className="document-row" key={label}>
+                  <div>
+                    <b>{label}</b>
+                    <small>PDF, JPG, PNG • Tối đa 10 MB</small>
                   </div>
-                ) : (
-                  <label className="document-upload">
-                    <input className="sr-only" type="file" />
-                    <CloudUpload />
-                    Chọn tệp hoặc kéo thả vào đây
-                  </label>
-                )}
-              </div>
-            ))}
+                  {file ? (
+                    <div className="uploaded-file">
+                      <FileText />
+                      <span>{file}</span>
+                      <b>Đã tải lên</b>
+                      <CheckCircle2 />
+                      <button
+                        aria-label={`Xóa ${label}`}
+                        onClick={() =>
+                          setUploadedDocuments((current) =>
+                            current.map((item, itemIndex) =>
+                              itemIndex === index ? null : item,
+                            ),
+                          )
+                        }
+                        type="button"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="document-upload">
+                      <input
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        className="sr-only"
+                        onChange={(event) => {
+                          const selectedFile = event.target.files?.[0];
+                          if (selectedFile)
+                            setUploadedDocuments((current) =>
+                              current.map((item, itemIndex) =>
+                                itemIndex === index ? selectedFile.name : item,
+                              ),
+                            );
+                        }}
+                        type="file"
+                      />
+                      <CloudUpload />
+                      Chọn tệp hoặc kéo thả vào đây
+                    </label>
+                  )}
+                </div>
+              );
+            })}
             <div className="wizard-footer">
-              <button>
+              <button onClick={() => navigate(-1)} type="button">
                 <ArrowLeft />
                 Quay lại
               </button>
@@ -509,25 +651,25 @@ export function ApplicationFormPage() {
           <aside className="application-progress">
             <header>
               <h2>Trạng thái hồ sơ</h2>
-              <span>
+              <span className="draft-badge">
                 <i />
                 Bản nháp
               </span>
             </header>
             <p>
-              Hoàn thành <b>2/3</b> tài liệu
+              Hoàn thành <b>{completedDocuments}/3</b> tài liệu
             </p>
             <div className="progress-bar">
-              <i />
+              <i style={{ width: `${(completedDocuments / 3) * 100}%` }} />
             </div>
             <ol>
               <li className="done">
                 <Check />
                 Thông tin đã hoàn tất
               </li>
-              <li className="done">
-                <Check />
-                Đã tải 2 tài liệu
+              <li className={completedDocuments > 0 ? "done" : ""}>
+                {completedDocuments > 0 ? <Check /> : <b>02</b>}
+                Đã tải {completedDocuments} tài liệu
               </li>
               <li>
                 <b>03</b>Chưa xác nhận hồ sơ
@@ -545,6 +687,8 @@ export function ApplicationFormPage() {
 }
 
 export function ApplicationLookupPage() {
+  const navigate = useNavigate();
+  const [lookupCode, setLookupCode] = useState("");
   return (
     <>
       <PageHero
@@ -556,18 +700,28 @@ export function ApplicationLookupPage() {
       <section className="lookup-section">
         <div className="container">
           <div className="lookup-card">
-            <form>
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                navigate(`/ho-so/${lookupCode.trim()}`);
+              }}
+            >
               <h2>Tra cứu hồ sơ</h2>
               <Field label="Mã hồ sơ">
-                <input placeholder="Ví dụ: HS-2026-001" />
+                <input
+                  onChange={(event) => setLookupCode(event.target.value)}
+                  placeholder="Ví dụ: HS-2026-001"
+                  required
+                  value={lookupCode}
+                />
               </Field>
               <Field label="Số điện thoại đăng ký">
-                <input placeholder="Nhập số điện thoại" />
+                <input placeholder="Nhập số điện thoại" required type="tel" />
               </Field>
-              <a href="/ho-so/HS-2026-001">
+              <button className="lookup-submit" type="submit">
                 <Search />
                 Tra cứu
-              </a>
+              </button>
               <p>
                 <LockKeyhole />
                 Thông tin chỉ được sử dụng để xác minh hồ sơ.
@@ -641,7 +795,7 @@ export function ApplicationStatusPage() {
               <span>Đang tiếp nhận</span>
             </div>
             <div className="tracking-summary__actions">
-              <a href="#">
+              <a href="#thong-tin-ho-so">
                 <FileText />
                 Xem hồ sơ
               </a>
@@ -697,7 +851,7 @@ export function ApplicationStatusPage() {
                 </p>
               </section>
             </div>
-            <aside className="tracking-info">
+            <aside className="tracking-info" id="thong-tin-ho-so">
               <h2>Thông tin hồ sơ</h2>
               {[
                 [GraduationCap, "Chương trình:", "Nghiệp vụ công đoàn"],

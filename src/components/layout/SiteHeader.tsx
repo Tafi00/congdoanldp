@@ -19,11 +19,17 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="container site-header__inner">
-        <NavLink to="/" className="brand" aria-label="Trường Công đoàn Giáo dục Việt Nam">
+        <NavLink
+          to="/"
+          className="brand"
+          aria-label="Trường Công đoàn Giáo dục Việt Nam"
+        >
           <span className="brand__mark">
             <img src={assets.logo} alt="" />
           </span>
-          <span className="brand__name">Trường Công đoàn Giáo dục Việt Nam</span>
+          <span className="brand__name">
+            Trường Công đoàn Giáo dục Việt&nbsp;Nam
+          </span>
         </NavLink>
 
         <nav className="site-nav" aria-label="Điều hướng chính">
@@ -63,7 +69,11 @@ export function SiteHeader() {
           >
             <div className="container mobile-nav__inner">
               {navItems.map((item) => (
-                <NavLink key={item.to} to={item.to} onClick={() => setOpen(false)}>
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                >
                   {item.label}
                 </NavLink>
               ))}

@@ -30,6 +30,8 @@ const answers = [
 ];
 const tests = [
   {
+    id: "nghiep-vu-cong-doan-01",
+    category: "union",
     icon: Users,
     tag: "Nghiệp vụ công đoàn",
     title: "Đề tổng hợp số 01",
@@ -39,6 +41,8 @@ const tests = [
     tone: "new",
   },
   {
+    id: "nghiep-vu-su-pham-01",
+    category: "pedagogy",
     icon: BookOpen,
     tag: "Nghiệp vụ sư phạm",
     title: "Đề ôn tập số 01",
@@ -48,6 +52,8 @@ const tests = [
     tone: "doing",
   },
   {
+    id: "quan-ly-giao-duc-01",
+    category: "management",
     icon: GraduationCap,
     tag: "Quản lý giáo dục",
     title: "Đề đánh giá số 01",
@@ -57,6 +63,15 @@ const tests = [
     tone: "done",
   },
 ];
+
+const testCategories = [
+  { value: "all", label: "Tất cả" },
+  { value: "union", label: "Nghiệp vụ công đoàn" },
+  { value: "pedagogy", label: "Nghiệp vụ sư phạm" },
+  { value: "management", label: "Quản lý giáo dục" },
+];
+
+const wrongQuestions = new Set([9, 20, 36]);
 
 function FocusHeader({ review = false }: { review?: boolean }) {
   return (
@@ -91,6 +106,25 @@ function FocusHeader({ review = false }: { review?: boolean }) {
 
 export function PracticeBankPage() {
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("all");
+  const [sort, setSort] = useState("newest");
+  const shownTests = tests
+    .filter(
+      (test) =>
+        (category === "all" || test.category === category) &&
+        (test.title + test.tag)
+          .toLowerCase()
+          .includes(query.trim().toLowerCase()),
+    )
+    .sort((first, second) => {
+      if (sort === "progress") {
+        return Number(second.tone === "doing") - Number(first.tone === "doing");
+      }
+      if (sort === "completed") {
+        return Number(second.tone === "done") - Number(first.tone === "done");
+      }
+      return 0;
+    });
   return (
     <div className="bank-page">
       <section className="bank-hero">
@@ -140,7 +174,8 @@ export function PracticeBankPage() {
             <CustomSelect
               className="custom-select--compact"
               ariaLabel="Sắp xếp đề thi"
-              defaultValue="newest"
+              value={sort}
+              onValueChange={setSort}
               options={[
                 { value: "newest", label: "Mới nhất" },
                 { value: "progress", label: "Đang làm" },
@@ -148,48 +183,52 @@ export function PracticeBankPage() {
               ]}
             />
           </div>
-          <div className="bank-tabs">
-            <button className="active">Tất cả</button>
-            <button>Nghiệp vụ công đoàn</button>
-            <button>Nghiệp vụ sư phạm</button>
-            <button>Quản lý giáo dục</button>
+          <div className="bank-tabs" role="group" aria-label="Lọc đề thi">
+            {testCategories.map((item) => (
+              <button
+                aria-pressed={category === item.value}
+                className={category === item.value ? "active" : ""}
+                key={item.value}
+                onClick={() => setCategory(item.value)}
+                type="button"
+              >
+                {item.label}
+              </button>
+            ))}
           </div>
           <div className="bank-grid">
-            {tests
-              .filter((t) =>
-                (t.title + t.tag).toLowerCase().includes(query.toLowerCase()),
-              )
-              .map(({ icon: Icon, ...test }) => (
-                <article className={`bank-card ${test.tone}`} key={test.title}>
-                  <div className="bank-card__intro">
-                    <span className="bank-card__icon">
-                      <Icon />
-                    </span>
-                    <div>
-                      <small>{test.tag}</small>
-                      <h2>{test.title}</h2>
-                      <p>{test.text}</p>
-                    </div>
+            {shownTests.map(({ icon: Icon, ...test }) => (
+              <article className={`bank-card ${test.tone}`} key={test.title}>
+                <div className="bank-card__intro">
+                  <span className="bank-card__icon">
+                    <Icon />
+                  </span>
+                  <div>
+                    <small>{test.tag}</small>
+                    <h2>{test.title}</h2>
+                    <p>{test.text}</p>
                   </div>
-                  <div className="bank-card__meta">
-                    <span>
-                      <BookOpen />
-                      40 câu
-                    </span>
-                    <span>
-                      <Clock3 />
-                      45 phút
-                    </span>
-                  </div>
-                  <p className="bank-card__status">
-                    {test.tone === "done" && <CheckCircle2 />}
-                    {test.status}
-                  </p>
-                  <Link to="/thi-thu/nghiep-vu-cong-doan-01">
-                    {test.action}
-                  </Link>
-                </article>
-              ))}
+                </div>
+                <div className="bank-card__meta">
+                  <span>
+                    <BookOpen />
+                    40 câu
+                  </span>
+                  <span>
+                    <Clock3 />
+                    45 phút
+                  </span>
+                </div>
+                <p className="bank-card__status">
+                  {test.tone === "done" && <CheckCircle2 />}
+                  {test.status}
+                </p>
+                <Link to={`/thi-thu/${test.id}`}>{test.action}</Link>
+              </article>
+            ))}
+            {shownTests.length === 0 && (
+              <p className="bank-empty">Không tìm thấy đề thi phù hợp.</p>
+            )}
           </div>
         </div>
       </section>
@@ -197,23 +236,32 @@ export function PracticeBankPage() {
   );
 }
 
-function QuestionGrid({ review = false }: { review?: boolean }) {
+function QuestionGrid({
+  review = false,
+  current = 8,
+  answered = new Set<number>(),
+  numbers = Array.from({ length: 40 }, (_, index) => index + 1),
+  onSelect,
+}: {
+  review?: boolean;
+  current?: number;
+  answered?: Set<number>;
+  numbers?: number[];
+  onSelect?: (question: number) => void;
+}) {
   return (
     <div className="question-grid">
-      {Array.from({ length: 40 }, (_, i) => i + 1).map((n) => (
+      {numbers.map((n) => (
         <button
-          className={`${n === 8 ? "current" : ""} ${review ? (n === 9 || n === 20 || n === 36 ? "wrong" : "answered") : n < 8 ? "answered" : ""}`}
+          aria-current={n === current ? "step" : undefined}
+          className={`${n === current ? "current" : ""} ${review ? (wrongQuestions.has(n) ? "wrong" : "answered") : answered.has(n) ? "answered" : ""}`}
           key={n}
+          onClick={() => onSelect?.(n)}
+          type="button"
         >
           {String(n).padStart(2, "0")}
-          {(review || n < 8) && (
-            <i>
-              {review && (n === 9 || n === 20 || n === 36) ? (
-                <CircleX />
-              ) : (
-                <Check />
-              )}
-            </i>
+          {(review || answered.has(n)) && (
+            <i>{review && wrongQuestions.has(n) ? <CircleX /> : <Check />}</i>
           )}
         </button>
       ))}
@@ -222,20 +270,51 @@ function QuestionGrid({ review = false }: { review?: boolean }) {
 }
 
 export function ExamPage() {
-  const [selected, setSelected] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState(8);
+  const [answersByQuestion, setAnswersByQuestion] = useState<
+    Record<number, number>
+  >(() =>
+    Object.fromEntries(Array.from({ length: 7 }, (_, index) => [index + 1, 0])),
+  );
+  const [markedQuestions, setMarkedQuestions] = useState<Set<number>>(
+    new Set(),
+  );
+  const selected = answersByQuestion[currentQuestion];
+  const answeredQuestions = new Set(Object.keys(answersByQuestion).map(Number));
+  const answeredCount = answeredQuestions.size;
+
+  const selectAnswer = (answer: number) => {
+    setAnswersByQuestion((current) => ({
+      ...current,
+      [currentQuestion]: answer,
+    }));
+  };
+
+  const toggleMarked = () => {
+    setMarkedQuestions((current) => {
+      const next = new Set(current);
+      if (next.has(currentQuestion)) next.delete(currentQuestion);
+      else next.add(currentQuestion);
+      return next;
+    });
+  };
   return (
     <div className="focus-page">
       <FocusHeader />
       <div className="exam-progress">
-        <i />
-        <span>Đã hoàn thành 7/40 câu</span>
+        <i style={{ width: `${(answeredCount / 40) * 675}px` }} />
+        <span>Đã hoàn thành {answeredCount}/40 câu</span>
       </div>
       <section className="exam-layout">
         <article className="exam-question">
           <div className="exam-question__body">
             <header>
-              <b>Câu 08</b>
-              <button>
+              <b>Câu {String(currentQuestion).padStart(2, "0")}</b>
+              <button
+                className={markedQuestions.has(currentQuestion) ? "marked" : ""}
+                onClick={toggleMarked}
+                type="button"
+              >
                 <Bookmark /> Đánh dấu
               </button>
             </header>
@@ -243,7 +322,7 @@ export function ExamPage() {
             <div className="exam-options">
               {answers.map((answer, i) => (
                 <button
-                  onClick={() => setSelected(i)}
+                  onClick={() => selectAnswer(i)}
                   className={selected === i ? "selected" : ""}
                   key={answer}
                 >
@@ -254,7 +333,13 @@ export function ExamPage() {
             </div>
           </div>
           <footer>
-            <button>
+            <button
+              disabled={currentQuestion === 1}
+              onClick={() =>
+                setCurrentQuestion((current) => Math.max(1, current - 1))
+              }
+              type="button"
+            >
               <ArrowLeft />
               Câu trước
             </button>
@@ -262,7 +347,14 @@ export function ExamPage() {
               <CheckCircle2 />
               Đã tự động lưu
             </span>
-            <button className="primary">
+            <button
+              className="primary"
+              disabled={currentQuestion === 40}
+              onClick={() =>
+                setCurrentQuestion((current) => Math.min(40, current + 1))
+              }
+              type="button"
+            >
               Câu tiếp theo
               <ArrowRight />
             </button>
@@ -270,7 +362,11 @@ export function ExamPage() {
         </article>
         <aside className="exam-sidebar">
           <h2>Danh sách câu hỏi</h2>
-          <QuestionGrid />
+          <QuestionGrid
+            answered={answeredQuestions}
+            current={currentQuestion}
+            onSelect={setCurrentQuestion}
+          />
           <div className="exam-legend">
             <span>
               <i className="answered" />
@@ -286,7 +382,7 @@ export function ExamPage() {
             </span>
           </div>
           <p>
-            <b>7/40</b> câu đã trả lời
+            <b>{answeredCount}/40</b> câu đã trả lời
           </p>
           <Link to="/thi-thu/nghiep-vu-cong-doan-01/ket-qua">Nộp bài</Link>
           <div className="exam-alert">
@@ -353,6 +449,21 @@ export function PracticeResultPage() {
 }
 
 export function AnswerReviewPage() {
+  const [currentQuestion, setCurrentQuestion] = useState(8);
+  const [wrongOnly, setWrongOnly] = useState(false);
+  const visibleQuestions = wrongOnly
+    ? Array.from(wrongQuestions)
+    : Array.from({ length: 40 }, (_, index) => index + 1);
+  const goToAdjacentQuestion = (direction: -1 | 1) => {
+    const currentIndex = visibleQuestions.indexOf(currentQuestion);
+    const safeIndex = currentIndex === -1 ? 0 : currentIndex;
+    const nextIndex = Math.min(
+      visibleQuestions.length - 1,
+      Math.max(0, safeIndex + direction),
+    );
+    setCurrentQuestion(visibleQuestions[nextIndex]);
+  };
+
   return (
     <div className="focus-page">
       <FocusHeader review />
@@ -361,7 +472,7 @@ export function AnswerReviewPage() {
           <div className="review-body">
             <h1>Xem lại đáp án</h1>
             <header>
-              <b>Câu 08</b>
+              <b>Câu {String(currentQuestion).padStart(2, "0")}</b>
               <span>
                 <CheckCircle2 />
                 Trả lời đúng
@@ -387,11 +498,11 @@ export function AnswerReviewPage() {
             </div>
           </div>
           <footer>
-            <button>
+            <button onClick={() => goToAdjacentQuestion(-1)} type="button">
               <ArrowLeft />
               Câu trước
             </button>
-            <button>
+            <button onClick={() => goToAdjacentQuestion(1)} type="button">
               Câu tiếp theo
               <ArrowRight />
             </button>
@@ -400,10 +511,34 @@ export function AnswerReviewPage() {
         <aside className="review-sidebar">
           <h2>Danh sách câu</h2>
           <div className="review-tabs">
-            <button className="active">Tất cả</button>
-            <button>Câu sai</button>
+            <button
+              aria-pressed={!wrongOnly}
+              className={!wrongOnly ? "active" : ""}
+              onClick={() => setWrongOnly(false)}
+              type="button"
+            >
+              Tất cả
+            </button>
+            <button
+              aria-pressed={wrongOnly}
+              className={wrongOnly ? "active" : ""}
+              onClick={() => {
+                setWrongOnly(true);
+                if (!wrongQuestions.has(currentQuestion)) {
+                  setCurrentQuestion(9);
+                }
+              }}
+              type="button"
+            >
+              Câu sai
+            </button>
           </div>
-          <QuestionGrid review />
+          <QuestionGrid
+            current={currentQuestion}
+            numbers={visibleQuestions}
+            onSelect={setCurrentQuestion}
+            review
+          />
           <div className="review-score">
             <span>
               <CheckCircle2 />

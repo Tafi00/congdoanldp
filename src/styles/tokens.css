@@ -1,8 +1,8 @@
 :root {
   color-scheme: light;
 
-  --font-display: "Be Vietnam Pro", "Segoe UI", sans-serif;
-  --font-body: "Be Vietnam Pro", "Segoe UI", sans-serif;
+  --font-display: "Roboto Condensed", "Be Vietnam Pro", sans-serif;
+  --font-body: "Be Vietnam Pro", Arial, sans-serif;
 
   --color-ink: #082650;
   --color-ink-soft: #4a5870;

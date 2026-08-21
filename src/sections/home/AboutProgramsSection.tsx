@@ -118,6 +118,12 @@ export function AboutProgramsSection() {
             {programs.map(({ icon: Icon, title, description, to }) => (
               <motion.article className="program-card" key={title} variants={fadeUp}>
                 <span className="program-card__accent" />
+                <img
+                  className="program-card__swoosh"
+                  src={assets.brandSwooshDecoration}
+                  alt=""
+                  aria-hidden="true"
+                />
                 <span className="program-card__icon">
                   <Icon size={37} strokeWidth={1.75} aria-hidden="true" />
                 </span>
