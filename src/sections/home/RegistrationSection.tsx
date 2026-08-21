@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { assets } from "../../data/assets";
 import { CustomSelect } from "../../components/ui/CustomSelect";
 import { fadeUp, stagger, viewportOnce } from "../../lib/motion";
+import { createRegistration } from "../../lib/publicPortal";
 import "./RegistrationSection.css";
 
 const benefits = [
@@ -63,6 +64,16 @@ export function RegistrationSection() {
             className="registration-form"
             onSubmit={(event) => {
               event.preventDefault();
+              const form = new FormData(event.currentTarget);
+              createRegistration({
+                program: String(form.get("program") ?? "union"),
+                studyMode: "flexible",
+                name: String(form.get("name") ?? "").trim(),
+                phone: String(form.get("phone") ?? "").trim(),
+                email: "",
+                organization: String(form.get("organization") ?? "").trim(),
+                position: "",
+              });
               navigate("/dang-ky-thanh-cong");
             }}
             variants={fadeUp}
@@ -84,6 +95,7 @@ export function RegistrationSection() {
             <label>
               <span>Họ và tên</span>
               <input
+                name="name"
                 type="text"
                 placeholder="Nhập họ và tên"
                 autoComplete="name"
@@ -93,6 +105,7 @@ export function RegistrationSection() {
             <label>
               <span>Số điện thoại</span>
               <input
+                name="phone"
                 type="tel"
                 placeholder="Nhập số điện thoại"
                 autoComplete="tel"
@@ -101,7 +114,12 @@ export function RegistrationSection() {
             </label>
             <label>
               <span>Đơn vị công tác</span>
-              <input type="text" placeholder="Nhập đơn vị công tác" required />
+              <input
+                name="organization"
+                type="text"
+                placeholder="Nhập đơn vị công tác"
+                required
+              />
             </label>
             <motion.button whileTap={{ scale: 0.985 }} type="submit">
               Gửi đăng ký

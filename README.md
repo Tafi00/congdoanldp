@@ -14,3 +14,6 @@ pnpm dev
 ```bash
 pnpm build
 ```
+
+Xem [PRODUCTION-READINESS.md](./PRODUCTION-READINESS.md) trước khi đưa hệ thống
+vào vận hành đa người dùng.

@@ -291,7 +291,19 @@ export function NewsPage() {
 
 export function NewsDetailPage() {
   const { slug } = useParams();
-  const currentNews = news.find((item) => item.slug === slug) ?? news[0];
+  const currentNews = news.find((item) => item.slug === slug);
+  if (!currentNews) {
+    return (
+      <section className="detail-head">
+        <div className="container">
+          <Crumbs detail />
+          <h1>Không tìm thấy bài viết</h1>
+          <p>Nội dung không tồn tại hoặc đã được di chuyển.</p>
+          <Link to="/tin-tuc">Quay lại danh sách tin tức</Link>
+        </div>
+      </section>
+    );
+  }
   const relatedNews = news
     .filter((item) => item.slug !== currentNews.slug)
     .slice(0, 3);

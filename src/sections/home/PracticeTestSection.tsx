@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BarChart3, BookOpenCheck, Clock3 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "../../components/ui/Button";
 import { assets } from "../../data/assets";
 import { fadeUp, stagger, viewportOnce } from "../../lib/motion";
+import { getPracticeQuestions } from "../../data/practiceTests";
 import "./PracticeTestSection.css";
 
 const features = [
@@ -12,16 +13,22 @@ const features = [
   { icon: BarChart3, title: "Lưu lịch sử kết quả" },
 ];
 
-const answers = [
-  "Bảo vệ quyền lợi người lao động",
-  "Quản lý ngân sách nhà nước",
-  "Cấp văn bằng đào tạo",
-  "Ban hành chương trình giáo dục",
-];
+const previewQuestions = getPracticeQuestions("nghiep-vu-cong-doan-01");
 
 export function PracticeTestSection() {
-  const [selectedAnswer, setSelectedAnswer] = useState(0);
-  const [currentQuestion, setCurrentQuestion] = useState(8);
+  const [selectedAnswers, setSelectedAnswers] = useState<
+    Record<number, number>
+  >({});
+  const [currentQuestion, setCurrentQuestion] = useState(1);
+  const [remainingSeconds, setRemainingSeconds] = useState(45 * 60);
+  useEffect(() => {
+    const timer = window.setInterval(
+      () => setRemainingSeconds((seconds) => Math.max(0, seconds - 1)),
+      1000,
+    );
+    return () => window.clearInterval(timer);
+  }, []);
+  const preview = previewQuestions[currentQuestion - 1];
   return (
     <section
       id="thi-thu"
@@ -77,21 +84,34 @@ export function PracticeTestSection() {
         >
           <div className="practice-demo__head">
             <b>Nghiệp vụ công đoàn – Đề tổng hợp</b>
-            <span>Câu {String(currentQuestion).padStart(2, "0")}/40</span>
+            <span>
+              Câu {String(currentQuestion).padStart(2, "0")}/
+              {String(previewQuestions.length).padStart(2, "0")}
+            </span>
             <i />
             <span>
               <Clock3 size={17} />
-              38:24
+              {String(Math.floor(remainingSeconds / 60)).padStart(2, "0")}:
+              {String(remainingSeconds % 60).padStart(2, "0")}
             </span>
           </div>
-          <h3>Nội dung nào thuộc chức năng đại diện của tổ chức công đoàn?</h3>
+          <h3>{preview.prompt}</h3>
           <div className="practice-demo__answers">
-            {answers.map((answer, index) => (
+            {preview.answers.map((answer, index) => (
               <button
-                aria-pressed={selectedAnswer === index}
-                className={selectedAnswer === index ? "is-selected" : ""}
+                aria-pressed={selectedAnswers[currentQuestion] === index}
+                className={
+                  selectedAnswers[currentQuestion] === index
+                    ? "is-selected"
+                    : ""
+                }
                 key={answer}
-                onClick={() => setSelectedAnswer(index)}
+                onClick={() =>
+                  setSelectedAnswers((answersByQuestion) => ({
+                    ...answersByQuestion,
+                    [currentQuestion]: index,
+                  }))
+                }
                 type="button"
               >
                 <i />
@@ -101,22 +121,24 @@ export function PracticeTestSection() {
           </div>
           <div className="practice-demo__foot">
             <div>
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                <button
-                  aria-current={n === currentQuestion ? "step" : undefined}
-                  className={n === currentQuestion ? "active" : ""}
-                  key={n}
-                  onClick={() => setCurrentQuestion(n)}
-                  type="button"
-                >
-                  {String(n).padStart(2, "0")}
-                </button>
-              ))}
+              {previewQuestions
+                .map((_, index) => index + 1)
+                .map((n) => (
+                  <button
+                    aria-current={n === currentQuestion ? "step" : undefined}
+                    className={n === currentQuestion ? "active" : ""}
+                    key={n}
+                    onClick={() => setCurrentQuestion(n)}
+                    type="button"
+                  >
+                    {String(n).padStart(2, "0")}
+                  </button>
+                ))}
             </div>
             <button
               onClick={() =>
                 setCurrentQuestion((current) =>
-                  current === 8 ? 1 : current + 1,
+                  current === previewQuestions.length ? 1 : current + 1,
                 )
               }
               type="button"

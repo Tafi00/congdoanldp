@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -15,19 +15,18 @@ import {
   Search,
   Users,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { assets } from "../data/assets";
+import { getPracticeQuestions } from "../data/practiceTests";
+import {
+  getExamResult,
+  getLatestExamResult,
+  saveExamResult,
+} from "../lib/publicPortal";
 import { CustomSelect } from "../components/ui/CustomSelect";
 import "./PracticeTestPages.css";
 import "./PracticeCorrections.css";
 
-const question = "Nội dung nào thuộc chức năng đại diện của tổ chức công đoàn?";
-const answers = [
-  "Bảo vệ quyền và lợi ích hợp pháp của người lao động",
-  "Quản lý ngân sách nhà nước",
-  "Cấp văn bằng đào tạo",
-  "Ban hành chương trình giáo dục",
-];
 const tests = [
   {
     id: "nghiep-vu-cong-doan-01",
@@ -36,9 +35,6 @@ const tests = [
     tag: "Nghiệp vụ công đoàn",
     title: "Đề tổng hợp số 01",
     text: "Kiểm tra kiến thức nền tảng và kỹ năng xử lý tình huống.",
-    status: "Chưa làm",
-    action: "Bắt đầu làm bài",
-    tone: "new",
   },
   {
     id: "nghiep-vu-su-pham-01",
@@ -47,9 +43,6 @@ const tests = [
     tag: "Nghiệp vụ sư phạm",
     title: "Đề ôn tập số 01",
     text: "Ôn tập phương pháp giảng dạy và năng lực nghề nghiệp.",
-    status: "Đang làm  •  18/40",
-    action: "Tiếp tục",
-    tone: "doing",
   },
   {
     id: "quan-ly-giao-duc-01",
@@ -58,34 +51,45 @@ const tests = [
     tag: "Quản lý giáo dục",
     title: "Đề đánh giá số 01",
     text: "Đánh giá kiến thức quản trị và tổ chức hoạt động giáo dục.",
-    status: "Đã hoàn thành  •  32/40",
-    action: "Làm lại",
-    tone: "done",
   },
 ];
 
-const wrongQuestions = new Set([9, 20, 36]);
+function getTest(id?: string) {
+  return tests.find((test) => test.id === id) ?? tests[0];
+}
 
-function FocusHeader({ review = false }: { review?: boolean }) {
+function formatTime(seconds: number) {
+  const minutes = Math.floor(seconds / 60);
+  return `${String(minutes).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+function FocusHeader({
+  review = false,
+  remainingSeconds = 45 * 60,
+}: {
+  review?: boolean;
+  remainingSeconds?: number;
+}) {
+  const { id } = useParams();
+  const test = getTest(id);
   return (
     <header className="focus-header">
       <Link to="/" className="focus-brand">
         <img src={assets.logo} alt="" />
         <b>TRƯỜNG CÔNG ĐOÀN GIÁO DỤC VIỆT NAM</b>
       </Link>
-      <h1>Nghiệp vụ công đoàn – Đề tổng hợp số 01</h1>
+      <h1>
+        {test.tag} – {test.title}
+      </h1>
       {review ? (
-        <Link
-          to="/thi-thu/nghiep-vu-cong-doan-01/ket-qua"
-          className="focus-back"
-        >
+        <Link to={`/thi-thu/${test.id}/ket-qua`} className="focus-back">
           <ArrowLeft /> Quay lại kết quả
         </Link>
       ) : (
         <div className="focus-time">
           <Clock3 />
           <span>
-            Thời gian còn lại<strong>38:24</strong>
+            Thời gian còn lại<strong>{formatTime(remainingSeconds)}</strong>
           </span>
           <Link to="/thi-thu">
             <LogOut />
@@ -100,6 +104,8 @@ function FocusHeader({ review = false }: { review?: boolean }) {
 export function PracticeBankPage() {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("newest");
+  const latestResult = getLatestExamResult();
+  const latestTest = getTest(latestResult?.testId);
   const shownTests = tests
     .filter((test) =>
       (test.title + test.tag)
@@ -107,11 +113,11 @@ export function PracticeBankPage() {
         .includes(query.trim().toLowerCase()),
     )
     .sort((first, second) => {
-      if (sort === "progress") {
-        return Number(second.tone === "doing") - Number(first.tone === "doing");
-      }
       if (sort === "completed") {
-        return Number(second.tone === "done") - Number(first.tone === "done");
+        return (
+          Number(Boolean(getExamResult(second.id))) -
+          Number(Boolean(getExamResult(first.id)))
+        );
       }
       return 0;
     });
@@ -134,32 +140,60 @@ export function PracticeBankPage() {
               ngay sau khi hoàn thành.
             </p>
           </div>
-          <div className="latest-result">
-            <div className="latest-result__head">
-              <span>
-                <small>Lần thi gần nhất</small>
-                <h2>Kết quả của bạn</h2>
-              </span>
-              <i>
-                <BarChart3 />
-              </i>
-            </div>
-            <div className="latest-result__body">
-              <strong className="latest-result__score">
-                32<small>/40</small>
-              </strong>
-              <div className="latest-result__summary">
+          {latestResult ? (
+            <div className="latest-result">
+              <div className="latest-result__head">
                 <span>
-                  <CheckCircle2 /> Hoàn thành tốt
+                  <small>Lần thi gần nhất</small>
+                  <h2>Kết quả của bạn</h2>
                 </span>
-                <b>Nghiệp vụ công đoàn</b>
-                <p>Đúng 80% tổng số câu hỏi</p>
-                <Link to="/thi-thu/nghiep-vu-cong-doan-01/ket-qua">
-                  Xem lịch sử <ArrowRight />
-                </Link>
+                <i>
+                  <BarChart3 />
+                </i>
+              </div>
+              <div className="latest-result__body">
+                <strong className="latest-result__score">
+                  {latestResult.correct}
+                  <small>/{latestResult.total}</small>
+                </strong>
+                <div className="latest-result__summary">
+                  <span>
+                    <CheckCircle2 />
+                    {latestResult.correct / latestResult.total >= 0.8
+                      ? "Hoàn thành tốt"
+                      : "Đã hoàn thành"}
+                  </span>
+                  <b>{latestTest.tag}</b>
+                  <p>
+                    Đúng{" "}
+                    {Math.round(
+                      (latestResult.correct / latestResult.total) * 100,
+                    )}
+                    % tổng số câu hỏi
+                  </p>
+                  <Link to={`/thi-thu/${latestResult.testId}/ket-qua`}>
+                    Xem lịch sử <ArrowRight />
+                  </Link>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="latest-result latest-result--empty">
+              <div className="latest-result__head">
+                <span>
+                  <small>Kết quả cá nhân</small>
+                  <h2>Chưa có bài thi</h2>
+                </span>
+                <i>
+                  <BarChart3 />
+                </i>
+              </div>
+              <p>Hoàn thành một đề thi để xem điểm số và lịch sử tại đây.</p>
+              <Link to={`/thi-thu/${tests[0].id}`}>
+                Bắt đầu làm bài <ArrowRight />
+              </Link>
+            </div>
+          )}
         </div>
       </section>
       <section className="bank-content">
@@ -180,41 +214,51 @@ export function PracticeBankPage() {
               onValueChange={setSort}
               options={[
                 { value: "newest", label: "Mới nhất" },
-                { value: "progress", label: "Đang làm" },
                 { value: "completed", label: "Đã hoàn thành" },
               ]}
             />
           </div>
           <div className="bank-grid">
-            {shownTests.map(({ icon: Icon, ...test }) => (
-              <article className={`bank-card ${test.tone}`} key={test.title}>
-                <div className="bank-card__intro">
-                  <span className="bank-card__icon">
-                    <Icon />
-                  </span>
-                  <div>
-                    <small>{test.tag}</small>
-                    <h2>{test.title}</h2>
-                    <p>{test.text}</p>
+            {shownTests.map(({ icon: Icon, ...test }) => {
+              const result = getExamResult(test.id);
+              const total = getPracticeQuestions(test.id).length;
+              return (
+                <article
+                  className={`bank-card ${result ? "done" : "new"}`}
+                  key={test.title}
+                >
+                  <div className="bank-card__intro">
+                    <span className="bank-card__icon">
+                      <Icon />
+                    </span>
+                    <div>
+                      <small>{test.tag}</small>
+                      <h2>{test.title}</h2>
+                      <p>{test.text}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="bank-card__meta">
-                  <span>
-                    <BookOpen />
-                    40 câu
-                  </span>
-                  <span>
-                    <Clock3 />
-                    45 phút
-                  </span>
-                </div>
-                <p className="bank-card__status">
-                  {test.tone === "done" && <CheckCircle2 />}
-                  {test.status}
-                </p>
-                <Link to={`/thi-thu/${test.id}`}>{test.action}</Link>
-              </article>
-            ))}
+                  <div className="bank-card__meta">
+                    <span>
+                      <BookOpen />
+                      {total} câu
+                    </span>
+                    <span>
+                      <Clock3 />
+                      45 phút
+                    </span>
+                  </div>
+                  <p className="bank-card__status">
+                    {result && <CheckCircle2 />}
+                    {result
+                      ? `Đã hoàn thành  •  ${result.correct}/${result.total}`
+                      : "Chưa làm"}
+                  </p>
+                  <Link to={`/thi-thu/${test.id}`}>
+                    {result ? "Làm lại" : "Bắt đầu làm bài"}
+                  </Link>
+                </article>
+              );
+            })}
             {shownTests.length === 0 && (
               <p className="bank-empty">Không tìm thấy đề thi phù hợp.</p>
             )}
@@ -227,15 +271,17 @@ export function PracticeBankPage() {
 
 function QuestionGrid({
   review = false,
-  current = 8,
+  current = 1,
   answered = new Set<number>(),
-  numbers = Array.from({ length: 40 }, (_, index) => index + 1),
+  numbers = [],
+  wrong = new Set<number>(),
   onSelect,
 }: {
   review?: boolean;
   current?: number;
   answered?: Set<number>;
   numbers?: number[];
+  wrong?: Set<number>;
   onSelect?: (question: number) => void;
 }) {
   return (
@@ -243,14 +289,14 @@ function QuestionGrid({
       {numbers.map((n) => (
         <button
           aria-current={n === current ? "step" : undefined}
-          className={`${n === current ? "current" : ""} ${review ? (wrongQuestions.has(n) ? "wrong" : "answered") : answered.has(n) ? "answered" : ""}`}
+          className={`${n === current ? "current" : ""} ${review ? (wrong.has(n) ? "wrong" : "answered") : answered.has(n) ? "answered" : ""}`}
           key={n}
           onClick={() => onSelect?.(n)}
           type="button"
         >
           {String(n).padStart(2, "0")}
           {(review || answered.has(n)) && (
-            <i>{review && wrongQuestions.has(n) ? <CircleX /> : <Check />}</i>
+            <i>{review && wrong.has(n) ? <CircleX /> : <Check />}</i>
           )}
         </button>
       ))}
@@ -259,18 +305,51 @@ function QuestionGrid({
 }
 
 export function ExamPage() {
-  const [currentQuestion, setCurrentQuestion] = useState(8);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const test = getTest(id);
+  const questions = useMemo(() => getPracticeQuestions(test.id), [test.id]);
+  const total = questions.length;
+  const [currentQuestion, setCurrentQuestion] = useState(1);
   const [answersByQuestion, setAnswersByQuestion] = useState<
     Record<number, number>
-  >(() =>
-    Object.fromEntries(Array.from({ length: 7 }, (_, index) => [index + 1, 0])),
-  );
+  >({});
   const [markedQuestions, setMarkedQuestions] = useState<Set<number>>(
     new Set(),
   );
+  const [remainingSeconds, setRemainingSeconds] = useState(45 * 60);
+  const [startedAt] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(
+      () => setRemainingSeconds((seconds) => Math.max(0, seconds - 1)),
+      1000,
+    );
+    return () => window.clearInterval(timer);
+  }, []);
+  const current = questions[currentQuestion - 1];
   const selected = answersByQuestion[currentQuestion];
   const answeredQuestions = new Set(Object.keys(answersByQuestion).map(Number));
   const answeredCount = answeredQuestions.size;
+
+  const submitExam = useCallback(() => {
+    const correct = questions.reduce(
+      (score, item, index) =>
+        score + (answersByQuestion[index + 1] === item.correct ? 1 : 0),
+      0,
+    );
+    saveExamResult({
+      testId: test.id,
+      correct,
+      total,
+      answers: answersByQuestion,
+      durationSeconds: Math.max(0, Math.round((Date.now() - startedAt) / 1000)),
+      completedAt: new Date().toISOString(),
+    });
+    navigate(`/thi-thu/${test.id}/ket-qua`);
+  }, [answersByQuestion, navigate, questions, startedAt, test.id, total]);
+  useEffect(() => {
+    if (remainingSeconds === 0) submitExam();
+  }, [remainingSeconds, submitExam]);
 
   const selectAnswer = (answer: number) => {
     setAnswersByQuestion((current) => ({
@@ -289,10 +368,14 @@ export function ExamPage() {
   };
   return (
     <div className="focus-page">
-      <FocusHeader />
+      <FocusHeader remainingSeconds={remainingSeconds} />
       <div className="exam-progress">
-        <i style={{ width: `${(answeredCount / 40) * 675}px` }} />
-        <span>Đã hoàn thành {answeredCount}/40 câu</span>
+        <div>
+          <i style={{ width: `${(answeredCount / total) * 100}%` }} />
+        </div>
+        <span>
+          Đã hoàn thành {answeredCount}/{total} câu
+        </span>
       </div>
       <section className="exam-layout">
         <article className="exam-question">
@@ -307,9 +390,9 @@ export function ExamPage() {
                 <Bookmark /> Đánh dấu
               </button>
             </header>
-            <h2>{question}</h2>
+            <h2>{current.prompt}</h2>
             <div className="exam-options">
-              {answers.map((answer, i) => (
+              {current.answers.map((answer, i) => (
                 <button
                   onClick={() => selectAnswer(i)}
                   className={selected === i ? "selected" : ""}
@@ -334,13 +417,15 @@ export function ExamPage() {
             </button>
             <span>
               <CheckCircle2 />
-              Đã tự động lưu
+              Đã ghi nhận
             </span>
             <button
               className="primary"
-              disabled={currentQuestion === 40}
+              disabled={currentQuestion === total}
               onClick={() =>
-                setCurrentQuestion((current) => Math.min(40, current + 1))
+                setCurrentQuestion((questionNumber) =>
+                  Math.min(total, questionNumber + 1),
+                )
               }
               type="button"
             >
@@ -354,6 +439,7 @@ export function ExamPage() {
           <QuestionGrid
             answered={answeredQuestions}
             current={currentQuestion}
+            numbers={Array.from({ length: total }, (_, index) => index + 1)}
             onSelect={setCurrentQuestion}
           />
           <div className="exam-legend">
@@ -371,9 +457,14 @@ export function ExamPage() {
             </span>
           </div>
           <p>
-            <b>{answeredCount}/40</b> câu đã trả lời
+            <b>
+              {answeredCount}/{total}
+            </b>{" "}
+            câu đã trả lời
           </p>
-          <Link to="/thi-thu/nghiep-vu-cong-doan-01/ket-qua">Nộp bài</Link>
+          <button className="exam-submit" onClick={submitExam} type="button">
+            Nộp bài
+          </button>
           <div className="exam-alert">
             <AlertTriangle />
             Hãy kiểm tra các câu chưa trả lời trước khi nộp bài.
@@ -385,51 +476,82 @@ export function ExamPage() {
 }
 
 export function PracticeResultPage() {
+  const { id } = useParams();
+  const test = getTest(id);
+  const result = getExamResult(test.id);
+  if (!result) {
+    return (
+      <section className="result-page">
+        <div className="result-card">
+          <h1>Chưa có kết quả</h1>
+          <p>Hãy hoàn thành bài thi trước khi xem kết quả.</p>
+          <div className="result-actions">
+            <Link className="primary" to={`/thi-thu/${test.id}`}>
+              Bắt đầu làm bài
+            </Link>
+            <Link to="/thi-thu">Về ngân hàng đề</Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
+  const percentage = Math.round((result.correct / result.total) * 100);
+  const minutes = Math.floor(result.durationSeconds / 60);
+  const seconds = result.durationSeconds % 60;
   return (
     <section className="result-page">
       <div className="result-card">
         <CheckCircle2 className="result-check" />
         <h1>Kết quả thi thử</h1>
-        <h2>Nghiệp vụ công đoàn – Đề tổng hợp số 01</h2>
+        <h2>
+          {test.tag} – {test.title}
+        </h2>
         <i className="result-divider" />
         <p>Bạn đã hoàn thành bài thi</p>
         <div className="result-main">
           <div className="result-ring">
             <strong>
-              32<small>/40</small>
+              {result.correct}
+              <small>/{result.total}</small>
             </strong>
-            <span>80%</span>
+            <span>{percentage}%</span>
           </div>
           <div className="result-summary">
-            <h3>Hoàn thành tốt</h3>
-            <p>Bạn đã nắm khá tốt nội dung của đề thi.</p>
+            <h3>
+              {percentage >= 80
+                ? "Hoàn thành tốt"
+                : percentage >= 50
+                  ? "Đã hoàn thành"
+                  : "Cần ôn tập thêm"}
+            </h3>
+            <p>Kết quả được tính trực tiếp từ các câu trả lời của bạn.</p>
             <div>
               <span className="good">
                 <CheckCircle2 />
                 <small>Đúng</small>
-                <b>32</b>
+                <b>{result.correct}</b>
               </span>
               <span className="bad">
                 <CircleX />
                 <small>Sai</small>
-                <b>8</b>
+                <b>{result.total - result.correct}</b>
               </span>
               <span>
                 <Clock3 />
                 <small>Thời gian</small>
-                <b>31:36</b>
+                <b>
+                  {String(minutes).padStart(2, "0")}:
+                  {String(seconds).padStart(2, "0")}
+                </b>
               </span>
             </div>
           </div>
         </div>
         <div className="result-actions">
-          <Link
-            className="primary"
-            to="/thi-thu/nghiep-vu-cong-doan-01/xem-dap-an"
-          >
+          <Link className="primary" to={`/thi-thu/${test.id}/xem-dap-an`}>
             Xem đáp án
           </Link>
-          <Link to="/thi-thu/nghiep-vu-cong-doan-01">Làm lại</Link>
+          <Link to={`/thi-thu/${test.id}`}>Làm lại</Link>
           <Link to="/thi-thu">Về ngân hàng đề</Link>
         </div>
       </div>
@@ -438,11 +560,27 @@ export function PracticeResultPage() {
 }
 
 export function AnswerReviewPage() {
-  const [currentQuestion, setCurrentQuestion] = useState(8);
+  const { id } = useParams();
+  const test = getTest(id);
+  const questions = getPracticeQuestions(test.id);
+  const result = getExamResult(test.id);
+  const wrongQuestions = new Set(
+    questions
+      .map((item, index) =>
+        result?.answers[index + 1] === item.correct ? null : index + 1,
+      )
+      .filter(
+        (questionNumber): questionNumber is number => questionNumber !== null,
+      ),
+  );
+  const [currentQuestion, setCurrentQuestion] = useState(1);
   const [wrongOnly, setWrongOnly] = useState(false);
   const visibleQuestions = wrongOnly
     ? Array.from(wrongQuestions)
-    : Array.from({ length: 40 }, (_, index) => index + 1);
+    : Array.from({ length: questions.length }, (_, index) => index + 1);
+  const current = questions[currentQuestion - 1];
+  const selectedAnswer = result?.answers[currentQuestion];
+  const isCorrect = selectedAnswer === current.correct;
   const goToAdjacentQuestion = (direction: -1 | 1) => {
     const currentIndex = visibleQuestions.indexOf(currentQuestion);
     const safeIndex = currentIndex === -1 ? 0 : currentIndex;
@@ -463,27 +601,29 @@ export function AnswerReviewPage() {
             <header>
               <b>Câu {String(currentQuestion).padStart(2, "0")}</b>
               <span>
-                <CheckCircle2 />
-                Trả lời đúng
+                {isCorrect ? <CheckCircle2 /> : <CircleX />}
+                {isCorrect ? "Trả lời đúng" : "Trả lời sai"}
               </span>
             </header>
-            <h2>{question}</h2>
+            <h2>{current.prompt}</h2>
             <label>Bạn đã chọn</label>
             <div className="review-choice">
               <i />
-              <span>{answers[0]}</span>
+              <span>
+                {selectedAnswer === undefined
+                  ? "Chưa trả lời"
+                  : current.answers[selectedAnswer]}
+              </span>
             </div>
             <label>Đáp án đúng</label>
             <div className="review-choice correct">
               <CheckCircle2 />
-              <span>{answers[0]}</span>
+              <span>{current.answers[current.correct]}</span>
             </div>
             <label>Giải thích</label>
             <div className="review-explain">
-              <span>ⓘ</span>Tổ chức công đoàn có chức năng đại diện, chăm lo và
-              bảo vệ quyền,
-              <br />
-              lợi ích hợp pháp của người lao động.
+              <span>ⓘ</span>
+              {current.explanation}
             </div>
           </div>
           <footer>
@@ -514,7 +654,7 @@ export function AnswerReviewPage() {
               onClick={() => {
                 setWrongOnly(true);
                 if (!wrongQuestions.has(currentQuestion)) {
-                  setCurrentQuestion(9);
+                  setCurrentQuestion(Array.from(wrongQuestions)[0] ?? 1);
                 }
               }}
               type="button"
@@ -527,17 +667,18 @@ export function AnswerReviewPage() {
             numbers={visibleQuestions}
             onSelect={setCurrentQuestion}
             review
+            wrong={wrongQuestions}
           />
           <div className="review-score">
             <span>
               <CheckCircle2 />
               <small>Đúng</small>
-              <b>32</b>
+              <b>{result?.correct ?? 0}</b>
             </span>
             <span>
               <CircleX />
               <small>Sai</small>
-              <b>8</b>
+              <b>{result ? result.total - result.correct : questions.length}</b>
             </span>
           </div>
         </aside>

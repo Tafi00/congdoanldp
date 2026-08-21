@@ -147,6 +147,17 @@
 .latest-result__summary a svg {
   width: 18px;
 }
+.latest-result--empty > p {
+  margin: 22px 0 18px;
+  color: #68758a;
+}
+.latest-result--empty > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #0758cf;
+  font-weight: 700;
+}
 .bank-content {
   padding: 28px 0 56px;
 }
@@ -354,19 +365,19 @@
   gap: 20px;
   position: relative;
 }
-.exam-progress:before {
-  content: "";
+.exam-progress > div {
   width: 675px;
   height: 6px;
   background: #edf0f4;
   border-radius: 10px;
+  overflow: hidden;
 }
 .exam-progress i {
-  position: absolute;
-  width: 230px;
+  display: block;
   height: 6px;
   border-radius: 10px;
   background: #0758cf;
+  transition: width 180ms ease;
 }
 .exam-progress span {
   color: #66728a;
@@ -595,6 +606,15 @@
   color: #fff;
   border-radius: 8px;
   font-size: 20px;
+}
+.exam-sidebar > .exam-submit {
+  width: 100%;
+  min-height: 50px;
+  border-radius: 8px;
+  background: #0758cf;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
 }
 .exam-alert {
   border: 1px solid #f3bc63;
@@ -965,7 +985,7 @@
     padding: 0 14px;
   }
   .focus-brand img {
-    width: 55px;
+    width: 70px;
   }
   .focus-brand b {
     display: none;
@@ -973,6 +993,19 @@
   .focus-time > a {
     margin-left: 5px;
     padding: 0 10px;
+  }
+  .exam-progress {
+    height: auto;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 20px;
+  }
+  .exam-progress > div {
+    width: 100%;
+  }
+  .exam-progress span {
+    font-size: 0.82rem;
   }
   .exam-question__body,
   .review-body {

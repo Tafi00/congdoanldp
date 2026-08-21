@@ -81,13 +81,32 @@ const NewsDetailPage = lazy(() =>
   })),
 );
 
-function PlaceholderPage() {
+function LegalPage({ title }: { title: string }) {
   return (
     <div className="container" style={{ paddingBlock: 80 }}>
-      <h1 className="heading-1">Trang đang được hoàn thiện</h1>
+      <h1 className="heading-1">{title}</h1>
       <p className="lead">
-        Component nền tảng đã sẵn sàng để triển khai màn hình này.
+        Trường Công đoàn Giáo dục Việt Nam cam kết bảo vệ thông tin người dùng
+        và chỉ sử dụng dữ liệu phục vụ đăng ký, tuyển sinh, đào tạo và hỗ trợ
+        học viên theo đúng mục đích đã thông báo.
       </p>
+      <p>
+        Khi sử dụng website, người dùng có trách nhiệm cung cấp thông tin chính
+        xác, bảo mật mã hồ sơ và liên hệ nhà trường khi cần điều chỉnh hoặc xóa
+        dữ liệu cá nhân.
+      </p>
+    </div>
+  );
+}
+
+function NotFoundPage() {
+  return (
+    <div className="container" style={{ paddingBlock: 80 }}>
+      <h1 className="heading-1">Không tìm thấy trang</h1>
+      <p className="lead">Đường dẫn không tồn tại hoặc đã được thay đổi.</p>
+      <a className="button button--primary" href="/">
+        Về trang chủ
+      </a>
     </div>
   );
 }
@@ -134,7 +153,15 @@ export function App() {
             <Route path="/gioi-thieu" element={<AboutPage />} />
             <Route path="/tin-tuc" element={<NewsPage />} />
             <Route path="/tin-tuc/:slug" element={<NewsDetailPage />} />
-            <Route path="*" element={<PlaceholderPage />} />
+            <Route
+              path="/chinh-sach-bao-mat"
+              element={<LegalPage title="Chính sách bảo mật" />}
+            />
+            <Route
+              path="/dieu-khoan-su-dung"
+              element={<LegalPage title="Điều khoản sử dụng" />}
+            />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>
       </main>

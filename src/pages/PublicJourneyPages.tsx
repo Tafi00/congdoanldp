@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
@@ -24,6 +24,15 @@ import {
 import { PageHero } from "../components/layout/PageHero";
 import { CustomSelect } from "../components/ui/CustomSelect";
 import { assets } from "../data/assets";
+import {
+  createApplication,
+  createRegistration,
+  findApplication,
+  findRegistration,
+  getLastRegistration,
+  programNames,
+  studyModeNames,
+} from "../lib/publicPortal";
 import "./PublicJourneyPages.css";
 
 const programs = [
@@ -69,7 +78,7 @@ function Field({
   className?: string;
 }) {
   return (
-    <label className={`mock-field ${className}`}>
+    <label className={`form-field ${className}`}>
       <span>{label}</span>
       {children}
     </label>
@@ -86,7 +95,7 @@ function Steps({
   labels?: [string, string, string];
 }) {
   return (
-    <div className={`mock-steps ${complete ? "is-complete" : ""}`}>
+    <div className={`journey-steps ${complete ? "is-complete" : ""}`}>
       {labels.map((label, i) => {
         const n = i + 1;
         return (
@@ -212,7 +221,7 @@ export function ProgramsPage() {
                 </dl>
                 <div className="program-list-card__actions">
                   <a href={`/chuong-trinh/${p.slug}`}>Xem chi tiết</a>
-                  <a href="/dang-ky">Đăng ký</a>
+                  <a href={`/dang-ky?program=${p.category}`}>Đăng ký</a>
                 </div>
               </article>
             ))}
@@ -222,7 +231,7 @@ export function ProgramsPage() {
               </p>
             )}
           </div>
-          <nav className="mock-pagination" aria-label="Phân trang chương trình">
+          <nav className="app-pagination" aria-label="Phân trang chương trình">
             {Array.from({ length: pageCount }, (_, index) => index + 1).map(
               (pageNumber) => (
                 <button
@@ -254,9 +263,27 @@ export function ProgramsPage() {
 
 export function ProgramDetailPage() {
   const { slug } = useParams();
-  const program = programs.find((p) => p.slug === slug) || programs[0];
+  const program = programs.find((p) => p.slug === slug);
   const [activeTab, setActiveTab] = useState("Tổng quan");
   const detailTabs = ["Tổng quan", "Nội dung", "Đối tượng", "Cách đăng ký"];
+  if (!program) {
+    return (
+      <>
+        <PageHero
+          title="Không tìm thấy chương trình"
+          description="Chương trình không tồn tại hoặc đã ngừng tuyển sinh."
+          current="Chương trình"
+        />
+        <section className="lookup-section">
+          <div className="container lookup-not-found">
+            <BookOpen />
+            <h2>Chọn một chương trình đang tuyển sinh</h2>
+            <a href="/chuong-trinh">Xem danh sách chương trình</a>
+          </div>
+        </section>
+      </>
+    );
+  }
   return (
     <>
       <section
@@ -313,7 +340,7 @@ export function ProgramDetailPage() {
                   {x}
                 </p>
               ))}
-              <a href="/dang-ky">Đăng ký ngay</a>
+              <a href={`/dang-ky?program=${program.category}`}>Đăng ký ngay</a>
               <a href="/nop-ho-so">Nộp hồ sơ trực tuyến</a>
             </aside>
           </div>
@@ -399,6 +426,13 @@ export function ProgramDetailPage() {
 }
 
 export function ProgramRegistrationPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const requestedProgram = searchParams.get("program") ?? "union";
+  const [selectedProgram, setSelectedProgram] = useState(
+    programNames[requestedProgram] ? requestedProgram : "union",
+  );
+  const [studyMode, setStudyMode] = useState("online");
   return (
     <>
       <PageHero
@@ -409,14 +443,32 @@ export function ProgramRegistrationPage() {
       />
       <section className="wizard-section">
         <div className="container wizard-layout">
-          <form className="wizard-card">
+          <form
+            className="wizard-card"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const form = new FormData(event.currentTarget);
+              createRegistration({
+                program: selectedProgram,
+                studyMode,
+                name: String(form.get("name") ?? "").trim(),
+                phone: String(form.get("phone") ?? "").trim(),
+                email: String(form.get("email") ?? "").trim(),
+                organization: String(form.get("organization") ?? "").trim(),
+                position: String(form.get("position") ?? "").trim(),
+              });
+              navigate("/dang-ky-thanh-cong");
+            }}
+          >
             <Steps />
             <h2>Thông tin chương trình</h2>
             <div className="wizard-grid">
               <Field label="Chương trình đăng ký">
                 <CustomSelect
                   className="custom-select--full"
-                  defaultValue="union"
+                  name="program"
+                  value={selectedProgram}
+                  onValueChange={setSelectedProgram}
                   options={[
                     { value: "union", label: "Nghiệp vụ công đoàn" },
                     { value: "pedagogy", label: "Nghiệp vụ sư phạm" },
@@ -427,49 +479,84 @@ export function ProgramRegistrationPage() {
               <Field label="Hình thức học">
                 <div className="radio-row">
                   <label>
-                    <input type="radio" defaultChecked name="study" />
+                    <input
+                      type="radio"
+                      checked={studyMode === "online"}
+                      name="study"
+                      onChange={() => setStudyMode("online")}
+                      value="online"
+                    />
                     Trực tuyến
                   </label>
                   <label>
-                    <input type="radio" name="study" />
+                    <input
+                      type="radio"
+                      checked={studyMode === "offline"}
+                      name="study"
+                      onChange={() => setStudyMode("offline")}
+                      value="offline"
+                    />
                     Trực tiếp
                   </label>
                   <label>
-                    <input type="radio" name="study" />
+                    <input
+                      type="radio"
+                      checked={studyMode === "flexible"}
+                      name="study"
+                      onChange={() => setStudyMode("flexible")}
+                      value="flexible"
+                    />
                     Linh hoạt
                   </label>
                 </div>
               </Field>
               <Field label="Họ và tên">
-                <input placeholder="Nhập họ và tên" />
+                <input name="name" placeholder="Nhập họ và tên" required />
               </Field>
               <Field label="Số điện thoại">
-                <input placeholder="Nhập số điện thoại" />
+                <input
+                  name="phone"
+                  pattern="[0-9+ ]{9,15}"
+                  placeholder="Nhập số điện thoại"
+                  required
+                  type="tel"
+                />
               </Field>
               <Field label="Email">
-                <input placeholder="Nhập email" />
+                <input
+                  name="email"
+                  placeholder="Nhập email"
+                  required
+                  type="email"
+                />
               </Field>
               <Field label="Đơn vị công tác">
-                <input placeholder="Nhập đơn vị công tác" />
+                <input
+                  name="organization"
+                  placeholder="Nhập đơn vị công tác"
+                  required
+                />
               </Field>
               <Field label="Chức vụ" className="full">
-                <input placeholder="Nhập chức vụ" />
+                <input name="position" placeholder="Nhập chức vụ" required />
               </Field>
             </div>
             <div className="wizard-footer">
               <label>
-                <input type="checkbox" />
+                <input required type="checkbox" />
                 Tôi đồng ý để nhà trường sử dụng thông tin cho công tác tuyển
                 sinh.
               </label>
-              <a href="/dang-ky-thanh-cong">Tiếp tục</a>
+              <button className="wizard-submit" type="submit">
+                Tiếp tục
+              </button>
             </div>
           </form>
           <aside className="registration-summary">
             <h2>Thông tin đăng ký</h2>
             <div className="summary-program">
               <BookOpen />
-              <b>Nghiệp vụ công đoàn</b>
+              <b>{programNames[selectedProgram]}</b>
             </div>
             <dl>
               <div>
@@ -484,7 +571,7 @@ export function ProgramRegistrationPage() {
                   <MonitorUp />
                   Hình thức:
                 </dt>
-                <dd>Trực tuyến & trực tiếp</dd>
+                <dd>{studyModeNames[studyMode]}</dd>
               </div>
             </dl>
             <h3>Bạn sẽ nhận được</h3>
@@ -509,6 +596,22 @@ export function ProgramRegistrationPage() {
 }
 
 export function RegistrationSuccessPage() {
+  const registration = getLastRegistration();
+  if (!registration) {
+    return (
+      <>
+        <PageHero title="Chưa có đăng ký" current="Đăng ký chương trình" />
+        <section className="lookup-section">
+          <div className="container lookup-not-found">
+            <BookOpen />
+            <h2>Vui lòng hoàn tất biểu mẫu đăng ký</h2>
+            <p>Thông tin xác nhận chỉ hiển thị sau khi biểu mẫu được gửi.</p>
+            <a href="/dang-ky">Đăng ký chương trình</a>
+          </div>
+        </section>
+      </>
+    );
+  }
   return (
     <>
       <PageHero title="Hoàn tất đăng ký" current="Hoàn tất" />
@@ -522,20 +625,20 @@ export function RegistrationSuccessPage() {
             thống.
           </p>
           <small>Mã đăng ký</small>
-          <strong>DK-2026-001</strong>
+          <strong>{registration?.code ?? "Chưa có đăng ký"}</strong>
           <h3>Thông tin đăng ký</h3>
           <dl>
             <div>
               <dt>Chương trình:</dt>
-              <dd>Nghiệp vụ công đoàn</dd>
+              <dd>{programNames[registration?.program ?? "union"]}</dd>
               <dt>Hình thức:</dt>
-              <dd>Trực tuyến</dd>
+              <dd>{studyModeNames[registration?.studyMode ?? "online"]}</dd>
             </div>
             <div>
               <dt>Người đăng ký:</dt>
-              <dd>Nguyễn Văn A</dd>
+              <dd>{registration?.name ?? "Chưa cập nhật"}</dd>
               <dt>Đơn vị công tác:</dt>
-              <dd>Đơn vị giáo dục</dd>
+              <dd>{registration?.organization ?? "Chưa cập nhật"}</dd>
             </div>
           </dl>
           <div className="completion-actions">
@@ -560,13 +663,18 @@ export function RegistrationSuccessPage() {
 
 export function ApplicationFormPage() {
   const navigate = useNavigate();
+  const registration = getLastRegistration();
   const documentLabels = [
     "Phiếu đăng ký",
     "Văn bằng hoặc chứng chỉ",
     "Giấy tờ tùy thân",
   ];
   const [uploadedDocuments, setUploadedDocuments] = useState<(string | null)[]>(
-    ["phieu-dang-ky.pdf", "van-bang.pdf", null],
+    [null, null, null],
+  );
+  const [uploadError, setUploadError] = useState("");
+  const [applicantPhone, setApplicantPhone] = useState(
+    registration?.phone ?? "",
   );
   const completedDocuments = uploadedDocuments.filter(Boolean).length;
 
@@ -580,12 +688,40 @@ export function ApplicationFormPage() {
       />
       <section className="wizard-section">
         <div className="container wizard-layout application-layout">
-          <form className="wizard-card application-wizard">
+          <form
+            className="wizard-card application-wizard"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (completedDocuments !== documentLabels.length) {
+                setUploadError(
+                  "Vui lòng tải đủ 3 tài liệu trước khi tiếp tục.",
+                );
+                return;
+              }
+              const application = createApplication(
+                uploadedDocuments.filter((file): file is string =>
+                  Boolean(file),
+                ),
+                applicantPhone,
+              );
+              navigate(`/ho-so/${application.code}`);
+            }}
+          >
             <Steps active={2} labels={["Thông tin", "Tài hồ sơ", "Xác nhận"]} />
             <div className="application-code">
               <FileText />
-              Hồ sơ: <b>HS-2026-001</b>
+              Hồ sơ mới: <b>Chưa gửi</b>
             </div>
+            <Field label="Số điện thoại đăng ký" className="application-phone">
+              <input
+                onChange={(event) => setApplicantPhone(event.target.value)}
+                pattern="[0-9+ ]{9,15}"
+                placeholder="Nhập số điện thoại để tra cứu hồ sơ"
+                required
+                type="tel"
+                value={applicantPhone}
+              />
+            </Field>
             <h2>Tài liệu hồ sơ</h2>
             {documentLabels.map((label, index) => {
               const file = uploadedDocuments[index];
@@ -622,12 +758,20 @@ export function ApplicationFormPage() {
                         className="sr-only"
                         onChange={(event) => {
                           const selectedFile = event.target.files?.[0];
-                          if (selectedFile)
-                            setUploadedDocuments((current) =>
-                              current.map((item, itemIndex) =>
-                                itemIndex === index ? selectedFile.name : item,
-                              ),
+                          if (!selectedFile) return;
+                          if (selectedFile.size > 10 * 1024 * 1024) {
+                            setUploadError(
+                              `${selectedFile.name} vượt quá giới hạn 10 MB.`,
                             );
+                            event.target.value = "";
+                            return;
+                          }
+                          setUploadError("");
+                          setUploadedDocuments((current) =>
+                            current.map((item, itemIndex) =>
+                              itemIndex === index ? selectedFile.name : item,
+                            ),
+                          );
                         }}
                         type="file"
                       />
@@ -638,14 +782,19 @@ export function ApplicationFormPage() {
                 </div>
               );
             })}
+            {uploadError && (
+              <p className="form-error" role="alert">
+                {uploadError}
+              </p>
+            )}
             <div className="wizard-footer">
               <button onClick={() => navigate(-1)} type="button">
                 <ArrowLeft />
                 Quay lại
               </button>
-              <a href="/ho-so/HS-2026-001">
+              <button className="wizard-submit" type="submit">
                 Tiếp tục <ArrowRight />
-              </a>
+              </button>
             </div>
           </form>
           <aside className="application-progress">
@@ -689,6 +838,8 @@ export function ApplicationFormPage() {
 export function ApplicationLookupPage() {
   const navigate = useNavigate();
   const [lookupCode, setLookupCode] = useState("");
+  const [lookupPhone, setLookupPhone] = useState("");
+  const [lookupError, setLookupError] = useState("");
   return (
     <>
       <PageHero
@@ -703,7 +854,15 @@ export function ApplicationLookupPage() {
             <form
               onSubmit={(event) => {
                 event.preventDefault();
-                navigate(`/ho-so/${lookupCode.trim()}`);
+                const application = findApplication(lookupCode, lookupPhone);
+                if (!application) {
+                  setLookupError(
+                    "Không tìm thấy hồ sơ khớp với mã và số điện thoại đã nhập.",
+                  );
+                  return;
+                }
+                setLookupError("");
+                navigate(`/ho-so/${application.code}`);
               }}
             >
               <h2>Tra cứu hồ sơ</h2>
@@ -716,12 +875,23 @@ export function ApplicationLookupPage() {
                 />
               </Field>
               <Field label="Số điện thoại đăng ký">
-                <input placeholder="Nhập số điện thoại" required type="tel" />
+                <input
+                  onChange={(event) => setLookupPhone(event.target.value)}
+                  placeholder="Nhập số điện thoại"
+                  required
+                  type="tel"
+                  value={lookupPhone}
+                />
               </Field>
               <button className="lookup-submit" type="submit">
                 <Search />
                 Tra cứu
               </button>
+              {lookupError && (
+                <p className="form-error" role="alert">
+                  {lookupError}
+                </p>
+              )}
               <p>
                 <LockKeyhole />
                 Thông tin chỉ được sử dụng để xác minh hồ sơ.
@@ -773,6 +943,34 @@ export function ApplicationLookupPage() {
 
 export function ApplicationStatusPage() {
   const { code } = useParams();
+  const application = code ? findApplication(code) : undefined;
+  if (!application) {
+    return (
+      <>
+        <PageHero
+          eyebrow="Theo dõi hồ sơ"
+          title="Không tìm thấy hồ sơ"
+          description="Mã hồ sơ không tồn tại trên thiết bị này hoặc chưa được gửi thành công."
+          current="Tra cứu hồ sơ"
+        />
+        <section className="lookup-section">
+          <div className="container lookup-not-found">
+            <Search />
+            <h2>Kiểm tra lại thông tin tra cứu</h2>
+            <p>Vui lòng dùng đúng mã hồ sơ và số điện thoại khi đăng ký.</p>
+            <a href="/tra-cuu-ho-so">Quay lại tra cứu</a>
+          </div>
+        </section>
+      </>
+    );
+  }
+  const completedStages =
+    application.status === "approved"
+      ? 4
+      : application.status === "reviewing"
+        ? 3
+        : 1;
+  const registration = findRegistration(application.registrationCode);
   return (
     <>
       <PageHero
@@ -787,12 +985,18 @@ export function ApplicationStatusPage() {
             <CircleCheckBig />
             <div>
               <small>Mã hồ sơ</small>
-              <strong>{code || "HS-2026-001"}</strong>
+              <strong>{application.code}</strong>
             </div>
             <i />
             <div>
               <small>Trạng thái hiện tại</small>
-              <span>Đang tiếp nhận</span>
+              <span>
+                {application.status === "approved"
+                  ? "Đã hoàn tất"
+                  : application.status === "reviewing"
+                    ? "Đang kiểm tra"
+                    : "Đã nộp"}
+              </span>
             </div>
             <div className="tracking-summary__actions">
               <a href="#thong-tin-ho-so">
@@ -827,7 +1031,10 @@ export function ApplicationStatusPage() {
                 ].map(([I, t, d, s], i) => {
                   const Icon = I as typeof CheckCircle2;
                   return (
-                    <article className={i < 2 ? "done" : ""} key={t as string}>
+                    <article
+                      className={i < completedStages ? "done" : ""}
+                      key={t as string}
+                    >
                       <strong>
                         {i === 0 ? <Check /> : String(i + 1).padStart(2, "0")}
                       </strong>
@@ -854,10 +1061,26 @@ export function ApplicationStatusPage() {
             <aside className="tracking-info" id="thong-tin-ho-so">
               <h2>Thông tin hồ sơ</h2>
               {[
-                [GraduationCap, "Chương trình:", "Nghiệp vụ công đoàn"],
-                [MonitorUp, "Hình thức:", "Trực tuyến"],
-                [UserRound, "Người đăng ký:", "Nguyễn Văn A"],
-                [FolderOpen, "Tài liệu:", "3 tệp đã nộp"],
+                [
+                  GraduationCap,
+                  "Chương trình:",
+                  programNames[registration?.program ?? "union"],
+                ],
+                [
+                  MonitorUp,
+                  "Hình thức:",
+                  studyModeNames[registration?.studyMode ?? "online"],
+                ],
+                [
+                  UserRound,
+                  "Người đăng ký:",
+                  registration?.name ?? "Chưa cập nhật",
+                ],
+                [
+                  FolderOpen,
+                  "Tài liệu:",
+                  `${application.documents.length} tệp đã nộp`,
+                ],
               ].map(([I, l, v]) => {
                 const Icon = I as typeof GraduationCap;
                 return (

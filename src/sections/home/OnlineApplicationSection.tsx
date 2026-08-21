@@ -9,6 +9,7 @@ import {
   Upload,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { assets } from "../../data/assets";
 import { CustomSelect } from "../../components/ui/CustomSelect";
 import { fadeUp, stagger, viewportOnce } from "../../lib/motion";
@@ -21,7 +22,8 @@ const steps = [
 ];
 
 export function OnlineApplicationSection() {
-  const [fileName, setFileName] = useState("bang-cap.pdf");
+  const navigate = useNavigate();
+  const [fileName, setFileName] = useState<string | null>(null);
   return (
     <section
       id="nop-ho-so"
@@ -69,6 +71,10 @@ export function OnlineApplicationSection() {
 
         <motion.form
           className="application-card"
+          onSubmit={(event) => {
+            event.preventDefault();
+            navigate("/nop-ho-so");
+          }}
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
@@ -113,15 +119,17 @@ export function OnlineApplicationSection() {
             <u>hoặc chọn tệp từ thiết bị</u>
             <small>PDF, JPG, PNG • Tối đa 10 MB/tệp</small>
           </label>
-          <div className="application-file">
-            <FileText size={25} />
-            <span>{fileName}</span>
-            <b>Đã tải lên</b>
-            <CheckCircle2 size={22} />
-          </div>
-          <a className="application-card__submit" href="/nop-ho-so">
+          {fileName && (
+            <div className="application-file">
+              <FileText size={25} />
+              <span>{fileName}</span>
+              <b>Đã chọn</b>
+              <CheckCircle2 size={22} />
+            </div>
+          )}
+          <button className="application-card__submit" type="submit">
             Nộp hồ sơ
-          </a>
+          </button>
           <span className="application-card__secure">
             <LockKeyhole size={18} /> Dữ liệu được bảo mật và chỉ dùng cho công
             tác tuyển sinh.
