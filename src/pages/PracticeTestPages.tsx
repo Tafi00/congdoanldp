@@ -64,13 +64,6 @@ const tests = [
   },
 ];
 
-const testCategories = [
-  { value: "all", label: "Tất cả" },
-  { value: "union", label: "Nghiệp vụ công đoàn" },
-  { value: "pedagogy", label: "Nghiệp vụ sư phạm" },
-  { value: "management", label: "Quản lý giáo dục" },
-];
-
 const wrongQuestions = new Set([9, 20, 36]);
 
 function FocusHeader({ review = false }: { review?: boolean }) {
@@ -106,15 +99,12 @@ function FocusHeader({ review = false }: { review?: boolean }) {
 
 export function PracticeBankPage() {
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("all");
   const [sort, setSort] = useState("newest");
   const shownTests = tests
-    .filter(
-      (test) =>
-        (category === "all" || test.category === category) &&
-        (test.title + test.tag)
-          .toLowerCase()
-          .includes(query.trim().toLowerCase()),
+    .filter((test) =>
+      (test.title + test.tag)
+        .toLowerCase()
+        .includes(query.trim().toLowerCase()),
     )
     .sort((first, second) => {
       if (sort === "progress") {
@@ -182,19 +172,6 @@ export function PracticeBankPage() {
                 { value: "completed", label: "Đã hoàn thành" },
               ]}
             />
-          </div>
-          <div className="bank-tabs" role="group" aria-label="Lọc đề thi">
-            {testCategories.map((item) => (
-              <button
-                aria-pressed={category === item.value}
-                className={category === item.value ? "active" : ""}
-                key={item.value}
-                onClick={() => setCategory(item.value)}
-                type="button"
-              >
-                {item.label}
-              </button>
-            ))}
           </div>
           <div className="bank-grid">
             {shownTests.map(({ icon: Icon, ...test }) => (

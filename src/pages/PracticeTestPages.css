@@ -123,26 +123,11 @@
   padding: 0 42px 0 18px;
   background: #fff;
 }
-.bank-tabs {
-  display: flex;
-  gap: 12px;
-  margin: 22px 0 27px;
-}
-.bank-tabs button {
-  background: #fff;
-  border: 1px solid #075edb;
-  color: #0758cf;
-  padding: 9px 24px;
-  border-radius: 8px;
-}
-.bank-tabs .active {
-  background: #0758cf;
-  color: #fff;
-}
 .bank-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  margin-top: 27px;
 }
 .bank-card {
   display: flex;
@@ -909,9 +894,6 @@
   }
   .bank-tools .custom-select {
     width: 100%;
-  }
-  .bank-tabs {
-    overflow: auto;
   }
   .focus-header {
     padding: 0 14px;
