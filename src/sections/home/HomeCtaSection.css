@@ -4,11 +4,12 @@
 }
 .home-cta__panel {
   display: grid;
-  min-height: 280px;
+  width: min(92%, 1580px);
+  min-height: clamp(240px, 18vw, 280px);
   grid-template-columns: auto minmax(360px, 1fr) auto;
   align-items: center;
-  gap: 42px;
-  padding: 50px 58px;
+  gap: clamp(42px, 3.6vw, 62px);
+  padding: clamp(36px, 3.4vw, 50px) clamp(36px, 4vw, 58px);
   border-radius: 22px;
   background-color: var(--color-primary-900);
   background-position: center;
@@ -18,8 +19,8 @@
 }
 .home-cta__icon {
   display: grid;
-  width: 118px;
-  height: 118px;
+  width: clamp(96px, 7vw, 118px);
+  height: clamp(96px, 7vw, 118px);
   place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 50%;
@@ -41,11 +42,27 @@
 }
 .home-cta__actions {
   display: flex;
-  gap: 18px;
+  gap: clamp(14px, 1.3vw, 18px);
 }
 .home-cta__actions .button {
-  min-width: 240px;
+  min-width: 280px;
   white-space: nowrap;
+}
+@media (max-width: 1500px) {
+  .home-cta__panel {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: clamp(24px, 2vw, 32px);
+    padding-inline: clamp(36px, 3vw, 46px);
+  }
+  .home-cta h2 {
+    font-size: clamp(1.55rem, 2vw, 1.8rem);
+  }
+  .home-cta__actions .button {
+    min-width: clamp(210px, 16vw, 240px);
+    gap: 8px;
+    padding-inline: 18px;
+    font-size: clamp(0.86rem, 0.95vw, 0.95rem);
+  }
 }
 @media (max-width: 1100px) {
   .home-cta__panel {
