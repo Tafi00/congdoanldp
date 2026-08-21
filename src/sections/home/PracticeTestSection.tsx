@@ -45,7 +45,8 @@ export function PracticeTestSection() {
             className="heading-2"
             variants={fadeUp}
           >
-            Làm quen cấu trúc đề, tự tin trước mỗi kỳ đánh giá
+            Làm quen cấu trúc đề,
+            <br /> tự tin trước mỗi kỳ đánh giá
           </motion.h2>
           <motion.p className="lead" variants={fadeUp}>
             Kiểm tra kiến thức, nhận kết quả ngay và ôn tập theo từng nhóm nội
