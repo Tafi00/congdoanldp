@@ -300,32 +300,32 @@
   background: #f2f8ff;
 }
 .focus-header {
-  height: 112px;
-  padding: 0 40px;
+  min-height: 84px;
+  padding: 12px clamp(16px, 3vw, 40px);
   background: #fff;
   border-bottom: 1px solid #dbe3ec;
   display: grid;
-  grid-template-columns: 430px 1fr 330px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 40px;
+  gap: 20px;
 }
 .focus-brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   color: #0758cf;
 }
 .focus-brand img {
-  width: 72px;
-  height: 76px;
+  width: 54px;
+  height: 54px;
   object-fit: contain;
 }
 .focus-brand b {
-  font-size: 18px;
+  font-size: 16px;
   white-space: nowrap;
 }
 .focus-header h1 {
-  font-size: 21px;
+  font-size: 1.1rem;
   margin: 0;
   color: #10182a;
 }
@@ -343,18 +343,20 @@
 }
 .focus-time strong {
   color: #0758cf;
-  font-size: 24px;
+  font-size: 1.35rem;
   line-height: 1.1;
 }
 .focus-time > a {
   border: 1px solid #075edb;
   border-radius: 8px;
-  height: 52px;
-  padding: 0 24px;
+  height: 46px;
+  padding: 0 18px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-left: 55px;
+  gap: 8px;
+  margin-left: 16px;
+  font-weight: 650;
+  white-space: nowrap;
 }
 .exam-progress {
   height: 62px;
@@ -913,7 +915,7 @@
 .review-score span:last-child b {
   color: #ef2531;
 }
-@media (max-width: 1000px) {
+@media (max-width: 1024px) {
   .bank-hero__grid,
   .bank-grid,
   .result-main {
@@ -925,6 +927,7 @@
   }
   .focus-header {
     grid-template-columns: 1fr auto;
+    gap: 12px;
   }
   .focus-header h1 {
     display: none;
@@ -935,14 +938,15 @@
   .exam-layout,
   .review-layout {
     grid-template-columns: 1fr;
-    padding: 20px;
+    padding: 20px clamp(16px, 3vw, 28px);
+    gap: 24px;
   }
   .exam-sidebar,
   .review-sidebar {
-    order: -1;
+    order: 2;
   }
   .question-grid {
-    grid-template-columns: repeat(8, 42px);
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
   }
   .result-summary {
     border: 0;
@@ -954,13 +958,13 @@
 }
 @media (max-width: 640px) {
   .bank-hero h1 {
-    font-size: 39px;
+    font-size: clamp(2rem, 8vw, 2.6rem);
   }
   .bank-grid {
     grid-template-columns: 1fr;
   }
   .latest-result {
-    padding: 22px;
+    padding: 20px 16px;
   }
   .latest-result__body {
     grid-template-columns: 1fr;
@@ -982,24 +986,34 @@
     width: 100%;
   }
   .focus-header {
-    padding: 0 14px;
+    padding: 8px 12px;
+    min-height: 64px;
   }
   .focus-brand img {
-    width: 70px;
+    width: 40px;
+    height: 40px;
   }
   .focus-brand b {
     display: none;
   }
+  .focus-time {
+    gap: 8px;
+  }
+  .focus-time strong {
+    font-size: 1.15rem;
+  }
   .focus-time > a {
-    margin-left: 5px;
-    padding: 0 10px;
+    margin-left: 4px;
+    padding: 0 12px;
+    height: 38px;
+    font-size: 0.82rem;
   }
   .exam-progress {
     height: auto;
     align-items: stretch;
     flex-direction: column;
     gap: 8px;
-    padding: 12px 20px;
+    padding: 10px 14px;
   }
   .exam-progress > div {
     width: 100%;
@@ -1009,37 +1023,78 @@
   }
   .exam-question__body,
   .review-body {
-    padding: 24px 18px;
+    padding: 20px 14px;
   }
   .exam-question h2,
   .review-question h2 {
-    font-size: 22px;
+    font-size: 1.25rem;
+    margin: 20px 0 16px;
+  }
+  .exam-options button {
+    min-height: 54px;
+    padding: 12px 14px;
+    gap: 12px;
+    font-size: 0.92rem;
+  }
+  .exam-options button > i {
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
   }
   .exam-question footer,
   .review-question footer {
-    padding: 15px;
+    padding: 14px;
     gap: 8px;
+    min-height: auto;
+    flex-wrap: wrap;
+  }
+  .exam-question footer button,
+  .review-question footer button {
+    height: 48px;
+    padding: 0 16px;
+    font-size: 0.9rem;
+    flex: 1;
   }
   .exam-question footer span {
     display: none;
   }
   .question-grid {
-    grid-template-columns: repeat(5, 42px);
+    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+    gap: 8px;
+  }
+  .question-grid button {
+    width: 36px;
+    height: 36px;
   }
   .result-card {
-    padding: 28px 16px;
+    padding: 24px 14px;
   }
-  .result-main {
-    grid-template-columns: 1fr;
+  .result-ring {
+    width: 180px;
+    height: 180px;
+  }
+  .result-ring strong {
+    font-size: 40px;
+  }
+  .result-ring span {
+    font-size: 20px;
   }
   .result-summary > div {
     grid-template-columns: 1fr;
   }
   .result-actions {
     flex-direction: column;
+    padding-top: 24px;
   }
   .result-actions a {
     min-width: 0;
+    width: 100%;
+    height: 50px;
+  }
+  .review-explain {
+    padding: 14px 16px;
+    gap: 12px;
+    font-size: 0.9rem;
   }
   .review-explain br {
     display: none;

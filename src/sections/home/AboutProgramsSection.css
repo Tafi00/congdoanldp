@@ -8,9 +8,9 @@
 
 .about-programs__top {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(500px, 0.9fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   align-items: center;
-  gap: clamp(42px, 6vw, 92px);
+  gap: clamp(36px, 5vw, 84px);
 }
 
 .about-programs__learn-more {
@@ -41,10 +41,10 @@
 
 .metric-card {
   display: grid;
-  min-height: 250px;
+  min-height: 230px;
   justify-items: center;
   align-content: center;
-  padding: 28px 18px;
+  padding: 24px 14px;
   border: 1px solid rgb(7 88 187 / 7%);
   border-radius: var(--radius-md);
   background: rgb(255 255 255 / 88%);
@@ -71,9 +71,9 @@
 }
 
 .metric-card__icon {
-  width: 70px;
-  height: 70px;
-  margin-bottom: 24px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 18px;
 }
 
 .metric-card strong {
@@ -81,19 +81,18 @@
   max-width: 100%;
   color: var(--color-primary-700);
   font-family: var(--font-display);
-  font-size: clamp(1.4rem, 1.8vw, 1.9rem);
+  font-size: clamp(1.3rem, 1.7vw, 1.85rem);
   line-height: 1.2;
-  white-space: nowrap;
 }
 
 .metric-card > span:last-child {
   margin-top: 8px;
   color: var(--color-ink-soft);
-  font-size: 0.91rem;
+  font-size: 0.88rem;
 }
 
 .featured-programs {
-  margin-top: clamp(54px, 5vw, 74px);
+  margin-top: clamp(48px, 5vw, 72px);
 }
 
 .featured-programs__label {
@@ -114,11 +113,11 @@
 .program-card {
   position: relative;
   display: flex;
-  min-height: 395px;
+  min-height: 380px;
   overflow: hidden;
   flex-direction: column;
   align-items: center;
-  padding: 38px 32px 0;
+  padding: 36px 28px 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: rgb(255 255 255 / 92%);
@@ -159,9 +158,9 @@
 }
 
 .program-card__icon {
-  width: 78px;
-  height: 78px;
-  margin-bottom: 20px;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 18px;
 }
 
 .program-card h3 {
@@ -171,7 +170,7 @@
 
 .program-card > p {
   max-width: 330px;
-  margin: 13px 0 20px;
+  margin: 12px 0 18px;
   color: var(--color-ink-soft);
 }
 
@@ -191,12 +190,12 @@
   position: relative;
   z-index: 1;
   display: flex;
-  width: calc(100% + 64px);
-  min-height: 62px;
+  width: calc(100% + 56px);
+  min-height: 58px;
   align-items: center;
   justify-content: center;
   gap: 9px;
-  margin: auto -32px 0;
+  margin: auto -28px 0;
   border-top: 1px solid var(--color-border);
   color: var(--color-primary-700);
   font-family: var(--font-display);
@@ -211,7 +210,7 @@
   transform: translateX(4px);
 }
 
-@media (max-width: 1120px) {
+@media (max-width: 1080px) {
   .about-programs__top {
     grid-template-columns: 1fr;
   }
@@ -227,16 +226,33 @@
   }
 
   .program-card {
-    min-height: 370px;
+    min-height: 340px;
   }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 640px) {
   .metric-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .metric-card {
-    min-height: 190px;
+    min-height: 160px;
+    padding: 20px 14px;
+  }
+
+  .metric-card__icon {
+    width: 54px;
+    height: 54px;
+    margin-bottom: 12px;
+  }
+
+  .program-card {
+    padding: 28px 18px 0;
+  }
+
+  .program-card__link {
+    width: calc(100% + 36px);
+    margin: auto -18px 0;
   }
 }

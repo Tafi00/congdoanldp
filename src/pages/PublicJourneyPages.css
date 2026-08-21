@@ -8,9 +8,9 @@
 }
 .program-filter {
   display: grid;
-  grid-template-columns: 340px 1fr 180px;
+  grid-template-columns: minmax(240px, 340px) 1fr auto;
   align-items: center;
-  gap: 45px;
+  gap: clamp(16px, 2.5vw, 36px);
   margin-bottom: 26px;
 }
 .program-filter > label {
@@ -20,6 +20,7 @@
   padding: 0 14px;
   border: 1px solid var(--color-border);
   border-radius: 9px;
+  background: #fff;
 }
 .program-filter input {
   height: 48px;
@@ -714,6 +715,10 @@
 }
 .uploaded-file > span {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .uploaded-file > b,
 .uploaded-file > svg:nth-last-child(2) {
@@ -1047,7 +1052,7 @@
 .tracking-info footer svg {
   flex: 0 0 auto;
 }
-@media (max-width: 1050px) {
+@media (max-width: 1080px) {
   .program-filter {
     grid-template-columns: 1fr;
   }
@@ -1060,13 +1065,14 @@
   }
   .program-detail-hero__layout,
   .wizard-layout,
+  .application-layout,
   .tracking-layout {
     grid-template-columns: 1fr;
   }
   .detail-register-card,
   .registration-summary,
   .application-progress {
-    max-width: 680px;
+    max-width: 720px;
   }
   .tracking-summary {
     grid-template-columns: auto 1fr;
@@ -1159,13 +1165,17 @@
     justify-content: center;
   }
   .tracking-info > p {
-    grid-template-columns: 44px 110px 1fr;
+    grid-template-columns: 38px 1fr;
+    gap: 10px;
+  }
+  .tracking-info > p > b {
+    grid-column: 2;
   }
   .program-list-card__head {
-    grid-template-columns: 70px 1fr;
+    grid-template-columns: 64px 1fr;
   }
   .program-list-card__head > span {
-    width: 62px;
-    height: 62px;
+    width: 58px;
+    height: 58px;
   }
 }

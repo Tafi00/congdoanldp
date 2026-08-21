@@ -21,7 +21,7 @@
 
 .registration-panel__intro,
 .registration-form {
-  padding: clamp(34px, 4.25vw, 58px);
+  padding: clamp(30px, 4vw, 54px);
 }
 
 .registration-panel__intro {
@@ -50,7 +50,7 @@
   display: flex;
   min-height: 74px;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
   border-bottom: 1px solid var(--color-border);
   color: var(--color-primary-700);
   font-family: var(--font-display);
@@ -62,6 +62,7 @@
   display: grid;
   width: 42px;
   height: 42px;
+  flex: 0 0 42px;
   place-items: center;
   border-radius: 50%;
   background: var(--color-primary-50);
@@ -132,12 +133,12 @@
 }
 
 .registration-steps {
-  --registration-step-gap: 44px;
+  --registration-step-gap: 36px;
 
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--registration-step-gap);
-  margin: 58px 40px 4px;
+  margin: 52px 20px 4px;
   padding: 0;
   color: white;
   list-style: none;
@@ -153,16 +154,16 @@
 
 .registration-steps li > strong {
   display: grid;
-  width: 92px;
-  height: 92px;
-  flex: 0 0 92px;
+  width: 80px;
+  height: 80px;
+  flex: 0 0 80px;
   place-items: center;
-  border: 7px solid rgb(255 255 255 / 42%);
+  border: 6px solid rgb(255 255 255 / 42%);
   border-radius: 50%;
   background: white;
   color: var(--color-primary-700);
   font-family: var(--font-display);
-  font-size: 1.65rem;
+  font-size: 1.45rem;
   line-height: 1;
   box-shadow: 0 8px 22px rgb(0 23 72 / 18%);
 }
@@ -170,19 +171,19 @@
 .registration-steps span {
   display: grid;
   min-width: 0;
-  gap: 7px;
+  gap: 6px;
 }
 
 .registration-steps b {
   font-family: var(--font-display);
-  font-size: 1.16rem;
+  font-size: 1.1rem;
   line-height: 1.25;
 }
 
 .registration-steps small {
   color: rgb(255 255 255 / 78%);
-  font-size: 0.86rem;
-  line-height: 1.55;
+  font-size: 0.84rem;
+  line-height: 1.5;
 }
 
 .registration-steps i {
@@ -191,8 +192,8 @@
   right: calc(var(--registration-step-gap) / -2);
   z-index: 1;
   display: grid;
-  width: 29px;
-  height: 29px;
+  width: 28px;
+  height: 28px;
   place-items: center;
   border-radius: 50%;
   background: var(--color-accent-500);
@@ -204,7 +205,7 @@
 .registration-steps i::after {
   position: absolute;
   top: 50%;
-  width: 26px;
+  width: 20px;
   border-top: 2px dotted rgb(255 255 255 / 46%);
   content: "";
   transform: translateY(-50%);
@@ -218,7 +219,7 @@
   left: 100%;
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1024px) {
   .registration-panel {
     grid-template-columns: 1fr;
   }
@@ -230,7 +231,7 @@
 
   .registration-steps {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 22px;
     margin-inline: 0;
   }
 
@@ -239,17 +240,30 @@
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 640px) {
+  .registration-section > .container {
+    width: min(calc(100% - 28px), 1284px);
+  }
+
   .registration-panel__intro,
   .registration-form {
-    padding: 28px 22px;
+    padding: 24px 18px;
+  }
+
+  .registration-benefits li {
+    font-size: 0.94rem;
+    min-height: 60px;
+  }
+
+  .registration-steps {
+    margin-top: 36px;
   }
 
   .registration-steps li > strong {
-    width: 70px;
-    height: 70px;
-    flex-basis: 70px;
-    border-width: 5px;
-    font-size: 1.35rem;
+    width: 62px;
+    height: 62px;
+    flex-basis: 62px;
+    border-width: 4px;
+    font-size: 1.25rem;
   }
 }

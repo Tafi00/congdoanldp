@@ -7,15 +7,15 @@
 }
 .practice-section__layout {
   display: grid;
-  width: min(calc(100% - 56px), 1620px);
-  grid-template-columns: minmax(620px, 0.9fr) minmax(680px, 1.15fr);
+  width: min(calc(100% - 40px), var(--container));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
   align-items: center;
-  gap: clamp(56px, 5vw, 88px);
+  gap: clamp(40px, 5vw, 76px);
 }
 .practice-copy .heading-2 {
   max-width: 680px;
   margin: 18px 0 22px;
-  font-size: clamp(2.2rem, 2.7vw, 2.8rem);
+  font-size: clamp(2.1rem, 2.7vw, 2.8rem);
 }
 .practice-copy .lead {
   max-width: 560px;
@@ -64,8 +64,8 @@
   margin-top: 34px;
 }
 .practice-actions .button {
-  min-width: 280px;
-  min-height: 60px;
+  min-width: 260px;
+  min-height: 56px;
 }
 .practice-actions > a:not(.button) {
   color: var(--color-primary-700);
@@ -74,11 +74,13 @@
 }
 .practice-demo {
   position: relative;
-  padding: 38px 40px;
+  padding: clamp(24px, 3.5vw, 38px);
   border: 1px solid #d1deed;
   border-radius: 18px;
   background: #fff;
   box-shadow: 0 24px 60px rgba(3, 45, 96, 0.13);
+  user-select: none;
+  pointer-events: none;
 }
 .practice-demo__head {
   display: grid;
@@ -105,15 +107,15 @@
 }
 .practice-demo > h3 {
   max-width: 590px;
-  margin: 32px 0 26px;
+  margin: 28px 0 24px;
   font-family: var(--font-display);
-  font-size: 1.45rem;
+  font-size: 1.35rem;
 }
 .practice-demo__answers {
   display: grid;
   gap: 12px;
 }
-.practice-demo__answers > button {
+.practice-demo__option {
   display: flex;
   width: 100%;
   align-items: center;
@@ -124,19 +126,21 @@
   background: #fff;
   color: inherit;
   text-align: left;
+  cursor: default;
 }
-.practice-demo__answers i {
+.practice-demo__option i {
   width: 22px;
   height: 22px;
+  flex: 0 0 22px;
   border: 2px solid #c7d2df;
   border-radius: 50%;
   box-shadow: inset 0 0 0 5px white;
 }
-.practice-demo__answers .is-selected {
+.practice-demo__option.is-selected {
   border-color: var(--color-primary-600);
   background: #f7fbff;
 }
-.practice-demo__answers .is-selected i {
+.practice-demo__option.is-selected i {
   border-color: var(--color-primary-700);
   background: var(--color-primary-700);
 }
@@ -151,9 +155,10 @@
 }
 .practice-demo__foot > div {
   display: flex;
+  flex-wrap: wrap;
   gap: 7px;
 }
-.practice-demo__foot > div button {
+.practice-demo__foot > div span {
   display: grid;
   width: 38px;
   height: 38px;
@@ -167,85 +172,77 @@
   font-size: 0.78rem;
   font-weight: 600;
   line-height: 1;
-  cursor: pointer;
-  transition:
-    border-color 160ms ease,
-    background-color 160ms ease,
-    color 160ms ease;
+  cursor: default;
 }
-.practice-demo__foot > div button:hover {
-  border-color: var(--color-primary-600);
-  color: var(--color-primary-700);
-}
-.practice-demo__foot > div button.active {
+.practice-demo__foot > div span.active {
   border-color: var(--color-primary-700);
   background: var(--color-primary-700);
   color: #fff;
 }
-.practice-demo__foot > button {
+.practice-demo__next-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 13px 22px;
   border-radius: 9px;
   background: var(--color-primary-700);
   color: #fff;
   font-weight: 700;
+  cursor: default;
+  white-space: nowrap;
 }
-@media (max-width: 1500px) {
+@media (max-width: 1200px) {
   .practice-section__layout {
-    grid-template-columns: minmax(480px, 0.82fr) minmax(620px, 1.18fr);
-    gap: 54px;
-  }
-  .practice-copy .heading-2 {
-    font-size: clamp(2.1rem, 2.8vw, 2.45rem);
-  }
-}
-@media (max-width: 1100px) {
-  .practice-section__layout {
-    width: min(calc(100% - 40px), var(--container));
     grid-template-columns: 1fr;
+    gap: 48px;
   }
   .practice-copy {
-    max-width: 690px;
+    max-width: 720px;
   }
   .practice-demo {
-    max-width: 780px;
+    max-width: 720px;
   }
 }
-@media (max-width: 700px) {
+@media (max-width: 640px) {
   .practice-section__layout {
     width: min(calc(100% - 28px), var(--container));
   }
   .practice-actions {
     align-items: stretch;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
   }
   .practice-actions .button {
     width: 100%;
+    min-width: 0;
   }
   .practice-demo {
-    padding: 24px 18px;
+    padding: 22px 16px;
   }
   .practice-demo__head {
     grid-template-columns: 1fr auto;
+    gap: 10px;
   }
-  .practice-demo__head i,
-  .practice-demo__head span:nth-of-type(1) {
+  .practice-demo__head i {
     display: none;
   }
   .practice-demo > h3 {
     font-size: 1.12rem;
+    margin: 20px 0 18px;
   }
   .practice-demo__foot {
     align-items: stretch;
     flex-direction: column;
+    gap: 14px;
   }
   .practice-demo__foot > div {
-    overflow: hidden;
+    justify-content: center;
   }
-  .practice-demo__foot button {
+  .practice-demo__next-btn {
     width: 100%;
   }
-  .practice-demo__answers > button {
-    padding: 13px;
+  .practice-demo__option {
+    padding: 13px 15px;
+    font-size: 0.92rem;
   }
 }

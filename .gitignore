@@ -18,3 +18,4 @@ Thumbs.db
 .vscode/
 
 ui-mockups/.archive/
+assets/generated/backup_*/

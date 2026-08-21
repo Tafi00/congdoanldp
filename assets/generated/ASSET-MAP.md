@@ -15,32 +15,32 @@ Website dùng trực tiếp các file WebP trong `optimized/`. Bộ production g
 
 ### Illustration nền trong suốt
 
-| File | Kích thước | Alpha | Công dụng |
+| File | Kích thước mới (Upscaled) | Alpha | Công dụng |
 | --- | ---: | :---: | --- |
-| `optimized/illustrations/hero-educators-cutout.webp` | 1536×1024 | Có | Cụm 4 cán bộ/giáo viên + laptop + mặt bàn; đặt trên nền hero hoặc trang giới thiệu. |
-| `optimized/illustrations/application-lookup-illustration.webp` | 1254×1254 | Có | Minh họa hồ sơ + kính lúp cho màn tra cứu hồ sơ. |
-| `optimized/illustrations/brand-swoosh-decoration.webp` | 1024×1536 | Có | Dải nhận diện xanh–cyan–vàng dùng như lớp trang trí độc lập ở góc card/banner. |
+| `optimized/illustrations/hero-educators-cutout.webp` | 2047×1364 (Super-sampled) | Có | Cụm 4 cán bộ/giáo viên + laptop + mặt bàn; đặt trên nền hero hoặc trang giới thiệu. |
+| `optimized/illustrations/application-lookup-illustration.webp` | 1671×1671 (Super-sampled) | Có | Minh họa hồ sơ + kính lúp cho màn tra cứu hồ sơ. |
+| `optimized/illustrations/brand-swoosh-decoration.webp` | 1364×2047 (Super-sampled) | Có | Dải nhận diện xanh–cyan–vàng dùng như lớp trang trí độc lập ở góc card/banner. |
 
 ### Background không chữ
 
-| File | Kích thước | Công dụng |
+| File | Kích thước mới (Upscaled) | Công dụng |
 | --- | ---: | --- |
-| `optimized/backgrounds/hero-background.webp` | 1672×941 | Hero trang chủ và hero trang giới thiệu; vùng trái đã chừa sạch cho nội dung. |
-| `optimized/backgrounds/page-header-background.webp` | 1942×809 | Header dùng chung cho trang chương trình, hồ sơ, thi thử và tin tức. |
-| `optimized/backgrounds/light-section-background.webp` | 1672×941 | Section sáng: giới thiệu, nộp hồ sơ, thi thử và các màn xác nhận. |
-| `optimized/backgrounds/registration-section-background.webp` | 1672×941 | Section đăng ký chương trình màu xanh đậm. |
-| `optimized/backgrounds/cta-banner-background.webp` | 1942×809 | CTA ngang; bo góc bằng CSS, không bo sẵn trong ảnh. |
-| `optimized/backgrounds/footer-background.webp` | 1774×887 | Footer xanh navy; vùng giữa đủ tối để đặt chữ trắng. |
-| `optimized/backgrounds/cms-login-background.webp` | 971×1619 | Nửa trái màn đăng nhập CMS; đặt logo và nội dung bằng HTML. |
+| `optimized/backgrounds/hero-background.webp` | 2090×1176 (2K Ultra-wide) | Hero trang chủ và hero trang giới thiệu; vùng trái đã chừa sạch cho nội dung. |
+| `optimized/backgrounds/page-header-background.webp` | 2427×1011 (2K Ultra-wide) | Header dùng chung cho trang chương trình, hồ sơ, thi thử và tin tức. |
+| `optimized/backgrounds/light-section-background.webp` | 2090×1176 (2K Ultra-wide) | Section sáng: giới thiệu, nộp hồ sơ, thi thử và các màn xác nhận. |
+| `optimized/backgrounds/registration-section-background.webp` | 2090×1176 (2K Ultra-wide) | Section đăng ký chương trình màu xanh đậm. |
+| `optimized/backgrounds/cta-banner-background.webp` | 2427×1011 (2K Ultra-wide) | CTA ngang; bo góc bằng CSS, không bo sẵn trong ảnh. |
+| `optimized/backgrounds/footer-background.webp` | 2217×1108 (2K Ultra-wide) | Footer xanh navy; vùng giữa đủ tối để đặt chữ trắng. |
+| `optimized/backgrounds/cms-login-background.webp` | 1213×2023 (2K Hi-DPI) | Nửa trái màn đăng nhập CMS; đặt logo và nội dung bằng HTML. |
 
 ### Ảnh nội dung không chữ
 
-| File | Kích thước | Công dụng |
+| File | Kích thước mới (Upscaled) | Công dụng |
 | --- | ---: | --- |
-| `optimized/photos/news-feature-enrollment.webp` | 1672×941 | Tin nổi bật tuyển sinh/hoạt động tư vấn. |
-| `optimized/photos/news-online-application.webp` | 1536×1024 | Tin hướng dẫn nộp hồ sơ trực tuyến. |
-| `optimized/photos/training-classroom.webp` | 1672×941 | Card hoạt động bồi dưỡng và ảnh chính bài chi tiết; có vùng crop an toàn. |
-| `optimized/photos/news-education-content.webp` | 1536×1024 | Tin cập nhật nội dung chuyên môn giáo dục. |
+| `optimized/photos/news-feature-enrollment.webp` | 2228×1254 (2K Crisp) | Tin nổi bật tuyển sinh/hoạt động tư vấn. |
+| `optimized/photos/news-online-application.webp` | 2047×1364 (2K Crisp) | Tin hướng dẫn nộp hồ sơ trực tuyến. |
+| `optimized/photos/training-classroom.webp` | 2228×1254 (2K Crisp) | Card hoạt động bồi dưỡng và ảnh chính bài chi tiết; có vùng crop an toàn. |
+| `optimized/photos/news-education-content.webp` | 2047×1364 (2K Crisp) | Tin cập nhật nội dung chuyên môn giáo dục. |
 
 ## Ánh xạ đủ 20 màn public
 

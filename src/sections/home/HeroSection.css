@@ -108,7 +108,7 @@
   position: relative;
   z-index: 2;
   width: min(860px, 59vw);
-  max-width: none;
+  max-width: 100%;
   margin-left: -4%;
   filter: drop-shadow(0 28px 34px rgb(4 42 91 / 12%));
 }
@@ -162,16 +162,16 @@
 
 @media (max-width: 1200px) {
   .hero__inner {
-    grid-template-columns: minmax(0, 1.08fr) minmax(430px, 0.92fr);
+    grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
   }
 
   .hero__people {
-    width: min(780px, 61vw);
-    margin-left: -10%;
+    width: min(720px, 55vw);
+    margin-left: -6%;
   }
 }
 
-@media (max-width: 920px) {
+@media (max-width: 960px) {
   .hero {
     min-height: auto;
     background-position: 39% center;
@@ -180,7 +180,7 @@
   .hero__inner {
     min-height: auto;
     grid-template-columns: 1fr;
-    padding-top: 72px;
+    padding-top: 56px;
     padding-bottom: 0;
   }
 
@@ -190,13 +190,28 @@
   }
 
   .hero__visual {
-    width: min(760px, 100%);
-    margin: 10px auto 0;
+    width: min(640px, 100%);
+    margin: 20px auto 0;
   }
 
   .hero__people {
-    width: 108%;
-    margin: 0 -4%;
+    width: 100%;
+    max-width: 580px;
+    margin: 0 auto;
+  }
+
+  .hero__orb--one {
+    width: 60px;
+    height: 60px;
+    top: 5%;
+    right: 10%;
+  }
+
+  .hero__orb--two {
+    width: 26px;
+    height: 26px;
+    right: 5%;
+    bottom: 15%;
   }
 
   .hero__scroll {
@@ -206,13 +221,17 @@
 
 @media (max-width: 640px) {
   .hero__inner {
-    padding-top: 48px;
+    padding-top: 40px;
   }
 
   .hero__kicker {
     flex-wrap: wrap;
-    margin-bottom: 22px;
+    margin-bottom: 18px;
     font-size: 0.74rem;
+  }
+
+  .hero__title {
+    font-size: clamp(2.1rem, 8.5vw, 2.9rem);
   }
 
   .hero__title br {
@@ -220,24 +239,42 @@
   }
 
   .hero__description {
-    margin-top: 20px;
-    font-size: 1rem;
-    line-height: 1.7;
+    margin-top: 16px;
+    font-size: 0.96rem;
+    line-height: 1.65;
   }
 
   .hero__actions {
-    display: grid;
-    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 24px;
+    gap: 12px;
+  }
+
+  .hero__actions .button {
+    width: 100%;
   }
 
   .hero__trust {
     align-items: flex-start;
-    margin-top: 28px;
-    font-size: 0.9rem;
+    margin-top: 24px;
+    font-size: 0.86rem;
+  }
+
+  .hero__trust-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
   }
 
   .hero__people {
-    width: 118%;
-    margin-left: -9%;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .hero__orb {
+    display: none;
   }
 }
