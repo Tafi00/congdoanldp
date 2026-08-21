@@ -72,9 +72,7 @@ export function SiteFooter() {
               <MapPin size={19} />
             </i>
             <span>
-              205 Võ Thị Sáu, Phường Xuân Hoà,
-              <br />
-              Thành phố Hồ Chí Minh, Việt Nam
+              205 Võ Thị Sáu, Phường Xuân Hoà, Thành phố Hồ Chí Minh, Việt Nam
             </span>
           </span>
         </div>

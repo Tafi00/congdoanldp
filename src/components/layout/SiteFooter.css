@@ -84,11 +84,12 @@
 .site-footer__contact > span {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  line-height: 1.65;
+  gap: 10px;
+  line-height: 1.55;
 }
 .site-footer__contact > span > span {
-  padding-top: 5px;
+  min-width: 0;
+  padding-top: 0;
 }
 .site-footer__contact > span > i {
   display: grid;
