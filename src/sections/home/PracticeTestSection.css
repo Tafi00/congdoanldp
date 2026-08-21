@@ -50,7 +50,7 @@
 .practice-actions .button {
   min-width: 250px;
 }
-.practice-actions > a {
+.practice-actions > a:not(.button) {
   color: var(--color-primary-700);
   font-weight: 700;
   text-decoration: underline;
