@@ -18,6 +18,20 @@
     border-color 240ms var(--ease-out);
 }
 
+.button > span {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.button > span > svg,
+.button > svg {
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+
 .button--primary {
   background: var(--gradient-primary);
   box-shadow: var(--shadow-button);
