@@ -29,11 +29,12 @@
   margin: 0 0 10px;
   color: #fff;
   font-family: var(--font-display);
-  font-size: clamp(1.6rem, 2.2vw, 2.2rem);
+  font-size: clamp(1.6rem, 2vw, 2rem);
+  letter-spacing: -0.035em;
   white-space: nowrap;
 }
 .home-cta p {
-  max-width: 580px;
+  max-width: 520px;
   margin: 0;
   color: rgba(255, 255, 255, 0.82);
   font-size: 1.05rem;
@@ -43,7 +44,7 @@
   gap: 18px;
 }
 .home-cta__actions .button {
-  min-width: 230px;
+  min-width: 240px;
   white-space: nowrap;
 }
 @media (max-width: 1100px) {

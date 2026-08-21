@@ -27,11 +27,11 @@ export function HomeCtaSection() {
           </p>
         </motion.div>
         <motion.div className="home-cta__actions" variants={fadeUp}>
-          <Button href="/dang-ky" variant="accent">
-            Đăng ký chương trình →
+          <Button href="/dang-ky" variant="accent" arrow>
+            Đăng ký chương trình
           </Button>
-          <Button href="/nop-ho-so" variant="secondary">
-            <FileText size={19} /> Nộp hồ sơ trực tuyến →
+          <Button href="/nop-ho-so" variant="secondary" arrow>
+            <FileText size={19} /> Nộp hồ sơ trực tuyến
           </Button>
         </motion.div>
       </motion.div>
