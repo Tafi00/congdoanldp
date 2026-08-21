@@ -6,6 +6,10 @@
   background-size: cover;
 }
 
+.registration-section > .container {
+  width: min(calc(100% - 40px), 1284px);
+}
+
 .registration-panel {
   display: grid;
   overflow: hidden;
@@ -128,12 +132,12 @@
 }
 
 .registration-steps {
-  --registration-step-gap: 30px;
+  --registration-step-gap: 44px;
 
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--registration-step-gap);
-  margin: 34px 0 0;
+  margin: 58px 40px 4px;
   padding: 0;
   color: white;
   list-style: none;
@@ -143,50 +147,75 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 20px;
+  min-width: 0;
 }
 
 .registration-steps li > strong {
   display: grid;
-  width: 74px;
-  height: 74px;
-  flex: 0 0 74px;
+  width: 92px;
+  height: 92px;
+  flex: 0 0 92px;
   place-items: center;
   border: 7px solid rgb(255 255 255 / 42%);
   border-radius: 50%;
   background: white;
   color: var(--color-primary-700);
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.65rem;
+  line-height: 1;
+  box-shadow: 0 8px 22px rgb(0 23 72 / 18%);
 }
 
 .registration-steps span {
   display: grid;
-  gap: 4px;
+  min-width: 0;
+  gap: 7px;
 }
 
 .registration-steps b {
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 1.16rem;
+  line-height: 1.25;
 }
 
 .registration-steps small {
   color: rgb(255 255 255 / 78%);
-  font-size: 0.83rem;
+  font-size: 0.86rem;
+  line-height: 1.55;
 }
 
 .registration-steps i {
   position: absolute;
   top: 50%;
   right: calc(var(--registration-step-gap) / -2);
+  z-index: 1;
   display: grid;
-  width: 27px;
-  height: 27px;
+  width: 29px;
+  height: 29px;
   place-items: center;
   border-radius: 50%;
   background: var(--color-accent-500);
   color: var(--color-primary-950);
   transform: translate(50%, -50%);
+}
+
+.registration-steps i::before,
+.registration-steps i::after {
+  position: absolute;
+  top: 50%;
+  width: 26px;
+  border-top: 2px dotted rgb(255 255 255 / 46%);
+  content: "";
+  transform: translateY(-50%);
+}
+
+.registration-steps i::before {
+  right: 100%;
+}
+
+.registration-steps i::after {
+  left: 100%;
 }
 
 @media (max-width: 980px) {
@@ -201,6 +230,8 @@
 
   .registration-steps {
     grid-template-columns: 1fr;
+    gap: 24px;
+    margin-inline: 0;
   }
 
   .registration-steps i {
@@ -215,8 +246,10 @@
   }
 
   .registration-steps li > strong {
-    width: 62px;
-    height: 62px;
-    flex-basis: 62px;
+    width: 70px;
+    height: 70px;
+    flex-basis: 70px;
+    border-width: 5px;
+    font-size: 1.35rem;
   }
 }

@@ -15,9 +15,21 @@ const benefits = [
 ];
 
 const steps = [
-  ["01", "Chọn chương trình", "Khám phá và chọn khóa học phù hợp."],
-  ["02", "Gửi thông tin", "Điền thông tin đăng ký nhanh chóng."],
-  ["03", "Nhận tư vấn", "Bộ phận tuyển sinh liên hệ tư vấn."],
+  [
+    "01",
+    "Chọn chương trình",
+    "Khám phá các chương trình và chọn khóa học phù hợp.",
+  ],
+  [
+    "02",
+    "Gửi thông tin",
+    "Điền thông tin đăng ký nhanh chóng, dễ dàng và chính xác.",
+  ],
+  [
+    "03",
+    "Nhận tư vấn",
+    "Bộ phận tuyển sinh liên hệ tư vấn lộ trình học phù hợp.",
+  ],
 ];
 
 export function RegistrationSection() {
