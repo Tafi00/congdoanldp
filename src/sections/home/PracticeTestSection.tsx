@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart3, BookOpenCheck, CheckCircle2, Clock3 } from "lucide-react";
+import { BarChart3, BookOpenCheck, Clock3 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "../../components/ui/Button";
 import { assets } from "../../data/assets";
@@ -123,19 +123,6 @@ export function PracticeTestSection() {
               Câu tiếp theo →
             </button>
           </div>
-          <aside className="practice-result">
-            <div>
-              <b>Kết quả gần nhất</b>
-              <BarChart3 size={20} />
-            </div>
-            <strong>
-              32<small>/40</small>
-            </strong>
-            <span>
-              <CheckCircle2 size={18} />
-              Hoàn thành tốt
-            </span>
-          </aside>
         </motion.div>
       </div>
     </section>
