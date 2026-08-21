@@ -1,19 +1,15 @@
-# Trường Công đoàn Giáo dục Việt Nam
+# Trường Công đoàn Giáo dục Việt Nam — Frontend
 
-Website giới thiệu chương trình đào tạo, đăng ký học, nộp hồ sơ trực tuyến, thi thử và hệ thống CMS.
-
-## Khởi chạy
+Frontend React/Vite đã kết nối API thật. Backend nằm tại `../congdoanldp-backend`.
 
 ```bash
-pnpm install
-pnpm dev
+corepack pnpm install
+corepack pnpm dev
 ```
 
-## Build production
+Local development dùng proxy `/api` đến `http://127.0.0.1:3001`. Khi build production, cấu hình `VITE_API_URL` theo `.env.example`.
 
 ```bash
-pnpm build
+corepack pnpm lint
+corepack pnpm build
 ```
-
-Xem [PRODUCTION-READINESS.md](./PRODUCTION-READINESS.md) trước khi đưa hệ thống
-vào vận hành đa người dùng.

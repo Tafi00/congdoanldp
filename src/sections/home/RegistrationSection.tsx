@@ -1,5 +1,6 @@
 import { Check, ChevronRight, LockKeyhole } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { assets } from "../../data/assets";
 import { CustomSelect } from "../../components/ui/CustomSelect";
@@ -21,6 +22,8 @@ const steps = [
 
 export function RegistrationSection() {
   const navigate = useNavigate();
+  const [submitError, setSubmitError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   return (
     <section
       id="dang-ky-nhanh"
@@ -62,19 +65,27 @@ export function RegistrationSection() {
 
           <motion.form
             className="registration-form"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
               const form = new FormData(event.currentTarget);
-              createRegistration({
-                program: String(form.get("program") ?? "union"),
-                studyMode: "flexible",
-                name: String(form.get("name") ?? "").trim(),
-                phone: String(form.get("phone") ?? "").trim(),
-                email: "",
-                organization: String(form.get("organization") ?? "").trim(),
-                position: "",
-              });
-              navigate("/dang-ky-thanh-cong");
+              setSubmitting(true);
+              setSubmitError("");
+              try {
+                await createRegistration({
+                  program: String(form.get("program") ?? "union"),
+                  studyMode: "flexible",
+                  name: String(form.get("name") ?? "").trim(),
+                  phone: String(form.get("phone") ?? "").trim(),
+                  email: "",
+                  organization: String(form.get("organization") ?? "").trim(),
+                  position: "",
+                });
+                navigate("/dang-ky-thanh-cong");
+              } catch (error) {
+                setSubmitError(error instanceof Error ? error.message : "Không thể gửi đăng ký.");
+              } finally {
+                setSubmitting(false);
+              }
             }}
             variants={fadeUp}
           >
@@ -121,9 +132,10 @@ export function RegistrationSection() {
                 required
               />
             </label>
-            <motion.button whileTap={{ scale: 0.985 }} type="submit">
-              Gửi đăng ký
+            <motion.button disabled={submitting} whileTap={{ scale: 0.985 }} type="submit">
+              {submitting ? "Đang gửi..." : "Gửi đăng ký"}
             </motion.button>
+            {submitError && <p className="form-error" role="alert">{submitError}</p>}
             <p className="registration-form__security">
               <LockKeyhole size={16} /> Thông tin của bạn được bảo mật.
             </p>

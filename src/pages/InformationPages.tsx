@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -11,52 +11,16 @@ import {
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { assets } from "../data/assets";
+import { getNews, getNewsArticle, type NewsRecord } from "../lib/publicPortal";
 import "./InformationPages.css";
 
-const news = [
-  {
-    slug: "huong-dan-nop-ho-so-truc-tuyen",
-    image: assets.newsOnlineApplication,
-    tag: "Thông báo",
-    title: "Hướng dẫn nộp hồ sơ trực tuyến",
-    text: "Các bước chuẩn bị và gửi hồ sơ trên hệ thống.",
-  },
-  {
-    slug: "hoat-dong-boi-duong-nghiep-vu-cong-doan",
-    image: assets.trainingClassroom,
-    tag: "Hoạt động",
-    title: "Hoạt động bồi dưỡng nghiệp vụ công đoàn",
-    text: "Thông tin về hoạt động đào tạo và bồi dưỡng.",
-  },
-  {
-    slug: "cap-nhat-noi-dung-chuyen-mon-giao-duc",
-    image: assets.newsEducationContent,
-    tag: "Chuyên môn",
-    title: "Cập nhật nội dung chuyên môn giáo dục",
-    text: "Tổng hợp nội dung phục vụ công tác chuyên môn.",
-  },
-  {
-    slug: "lich-khai-giang-cac-chuong-trinh-boi-duong",
-    image: assets.newsFeatureEnrollment,
-    tag: "Thông báo",
-    title: "Lịch khai giảng các chương trình bồi dưỡng",
-    text: "Cập nhật thời gian dự kiến và hướng dẫn xác nhận tham gia.",
-  },
-  {
-    slug: "hoi-thao-doi-moi-hoat-dong-cong-doan",
-    image: assets.trainingClassroom,
-    tag: "Hoạt động",
-    title: "Hội thảo đổi mới hoạt động công đoàn",
-    text: "Chia sẻ kinh nghiệm tổ chức hoạt động trong ngành giáo dục.",
-  },
-  {
-    slug: "tai-lieu-quan-ly-giao-duc-cap-nhat",
-    image: assets.newsEducationContent,
-    tag: "Chuyên môn",
-    title: "Tài liệu quản lý giáo dục cập nhật",
-    text: "Nguồn tài liệu tham khảo dành cho cán bộ quản lý giáo dục.",
-  },
-];
+function newsImage(item: NewsRecord) {
+  if (item.imageUrl) return item.imageUrl;
+  if (item.slug.includes("ho-so")) return assets.newsOnlineApplication;
+  if (item.tag === "Hoạt động") return assets.trainingClassroom;
+  if (item.tag === "Chuyên môn") return assets.newsEducationContent;
+  return assets.newsFeatureEnrollment;
+}
 
 const newsCategories = ["Tất cả", "Thông báo", "Hoạt động", "Chuyên môn"];
 const newsPerPage = 3;
@@ -156,9 +120,12 @@ export function AboutPage() {
 }
 
 export function NewsPage() {
+  const [news, setNews] = useState<NewsRecord[]>([]);
+  const [loadError, setLoadError] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Tất cả");
   const [page, setPage] = useState(1);
+  useEffect(() => { void getNews().then(setNews).catch((error) => setLoadError(error instanceof Error ? error.message : "Không thể tải tin tức.")); }, []);
   const filteredNews = news.filter(
     (item) =>
       (category === "Tất cả" || item.tag === category) &&
@@ -244,7 +211,7 @@ export function NewsPage() {
           <div className="news-cards">
             {shownNews.map((item) => (
               <article key={item.slug}>
-                <img src={item.image} alt="" />
+                <img src={newsImage(item)} alt="" />
                 <div>
                   <small>{item.tag}</small>
                   <h2>{item.title}</h2>
@@ -258,6 +225,7 @@ export function NewsPage() {
             {shownNews.length === 0 && (
               <p className="news-empty">Không tìm thấy tin tức phù hợp.</p>
             )}
+            {loadError && <p className="news-empty form-error">{loadError}</p>}
           </div>
           <nav className="news-pages" aria-label="Phân trang tin tức">
             {Array.from({ length: pageCount }, (_, index) => index + 1).map(
@@ -291,8 +259,14 @@ export function NewsPage() {
 
 export function NewsDetailPage() {
   const { slug } = useParams();
-  const currentNews = news.find((item) => item.slug === slug);
-  if (!currentNews) {
+  const [currentNews, setCurrentNews] = useState<NewsRecord | null>();
+  const [relatedNews, setRelatedNews] = useState<NewsRecord[]>([]);
+  useEffect(() => {
+    if (!slug) { setCurrentNews(null); return; }
+    void Promise.all([getNewsArticle(slug), getNews()]).then(([article, all]) => { setCurrentNews(article); setRelatedNews(all.filter((item) => item.slug !== slug).slice(0, 3)); }).catch(() => setCurrentNews(null));
+  }, [slug]);
+  if (currentNews === undefined) return <section className="detail-head"><div className="container"><p>Đang tải bài viết...</p></div></section>;
+  if (currentNews === null) {
     return (
       <section className="detail-head">
         <div className="container">
@@ -304,10 +278,6 @@ export function NewsDetailPage() {
       </section>
     );
   }
-  const relatedNews = news
-    .filter((item) => item.slug !== currentNews.slug)
-    .slice(0, 3);
-
   return (
     <>
       <section className="detail-head">
@@ -321,12 +291,9 @@ export function NewsDetailPage() {
       <section className="detail-content">
         <div className="container detail-grid">
           <main>
-            <img src={currentNews.image} alt={currentNews.title} />
+            <img src={newsImage(currentNews)} alt={currentNews.title} />
             <h2>Các lĩnh vực bồi dưỡng</h2>
-            <p>
-              Nhà trường tổ chức các chương trình tập trung vào nghiệp vụ công
-              đoàn, nghiệp vụ sư phạm và quản lý giáo dục.
-            </p>
+            <p>{currentNews.content}</p>
             <ul>
               <li>Nghiệp vụ công đoàn</li>
               <li>Nghiệp vụ sư phạm</li>

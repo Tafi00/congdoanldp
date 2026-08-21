@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -28,36 +28,20 @@ import {
   createApplication,
   createRegistration,
   findApplication,
-  findRegistration,
   getLastRegistration,
+  getLastApplicationReference,
+  getLastRegistrationReference,
+  getProgram,
+  getPrograms,
+  type ApplicationRecord,
+  type ProgramRecord,
+  type RegistrationRecord,
   programNames,
   studyModeNames,
 } from "../lib/publicPortal";
 import "./PublicJourneyPages.css";
 
-const programs = [
-  {
-    slug: "nghiep-vu-cong-doan",
-    category: "union",
-    icon: Users,
-    title: "Nghiệp vụ công đoàn",
-    text: "Bồi dưỡng kỹ năng tổ chức, quản lý và hoạt động công đoàn.",
-  },
-  {
-    slug: "nghiep-vu-su-pham",
-    category: "pedagogy",
-    icon: BookOpen,
-    title: "Nghiệp vụ sư phạm",
-    text: "Cập nhật phương pháp giảng dạy và năng lực nghề nghiệp.",
-  },
-  {
-    slug: "quan-ly-giao-duc",
-    category: "management",
-    icon: GraduationCap,
-    title: "Quản lý giáo dục",
-    text: "Nâng cao năng lực quản trị cho cán bộ quản lý giáo dục.",
-  },
-];
+const programIcons = { union: Users, pedagogy: BookOpen, management: GraduationCap } as const;
 
 const programCategories = [
   { value: "all", label: "Tất cả" },
@@ -111,10 +95,13 @@ function Steps({
 }
 
 export function ProgramsPage() {
+  const [programs, setPrograms] = useState<ProgramRecord[]>([]);
+  const [loadError, setLoadError] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [sort, setSort] = useState("newest");
   const [page, setPage] = useState(1);
+  useEffect(() => { void getPrograms().then(setPrograms).catch((error) => setLoadError(error instanceof Error ? error.message : "Không thể tải chương trình.")); }, []);
 
   const filteredPrograms = programs
     .filter(
@@ -191,8 +178,9 @@ export function ProgramsPage() {
             />
           </div>
           <div className="program-list-grid">
-            {shown.map(({ icon: Icon, ...p }) => (
-              <article key={p.slug}>
+            {shown.map((p) => {
+              const Icon = programIcons[p.category as keyof typeof programIcons] ?? BookOpen;
+              return <article key={p.slug}>
                 <div className="program-list-card__head">
                   <span>
                     <Icon size={31} />
@@ -200,7 +188,7 @@ export function ProgramsPage() {
                   <div>
                     <small>Đang tuyển sinh</small>
                     <h2>{p.title}</h2>
-                    <p>{p.text}</p>
+                    <p>{p.summary}</p>
                   </div>
                 </div>
                 <dl>
@@ -223,8 +211,9 @@ export function ProgramsPage() {
                   <a href={`/chuong-trinh/${p.slug}`}>Xem chi tiết</a>
                   <a href={`/dang-ky?program=${p.category}`}>Đăng ký</a>
                 </div>
-              </article>
-            ))}
+              </article>;
+            })}
+            {loadError && <p className="program-list-empty form-error">{loadError}</p>}
             {shown.length === 0 && (
               <p className="program-list-empty">
                 Không tìm thấy chương trình phù hợp.
@@ -263,10 +252,12 @@ export function ProgramsPage() {
 
 export function ProgramDetailPage() {
   const { slug } = useParams();
-  const program = programs.find((p) => p.slug === slug);
+  const [program, setProgram] = useState<ProgramRecord | null>();
   const [activeTab, setActiveTab] = useState("Tổng quan");
+  useEffect(() => { if (!slug) { setProgram(null); return; } void getProgram(slug).then(setProgram).catch(() => setProgram(null)); }, [slug]);
   const detailTabs = ["Tổng quan", "Nội dung", "Đối tượng", "Cách đăng ký"];
-  if (!program) {
+  if (program === undefined) return <section className="lookup-section"><div className="container lookup-not-found"><p>Đang tải chương trình...</p></div></section>;
+  if (program === null) {
     return (
       <>
         <PageHero
@@ -306,8 +297,7 @@ export function ProgramDetailPage() {
               </span>
               <h1 className="heading-1">{program.title}</h1>
               <p className="lead">
-                Bồi dưỡng kiến thức và kỹ năng tổ chức, quản lý, triển khai hoạt
-                động công đoàn trong ngành giáo dục.
+                {program.description}
               </p>
               <dl className="detail-meta">
                 <div>
@@ -315,7 +305,7 @@ export function ProgramDetailPage() {
                     <Users />
                   </dt>
                   <dd>
-                    <b>Đối tượng</b>Cán bộ công đoàn, viên chức ngành giáo dục
+                    <b>Đối tượng</b>{program.audience}
                   </dd>
                 </div>
                 <div>
@@ -323,7 +313,7 @@ export function ProgramDetailPage() {
                     <MonitorUp />
                   </dt>
                   <dd>
-                    <b>Hình thức</b>Trực tuyến & trực tiếp
+                    <b>Hình thức</b>{program.studyModes.map((mode) => studyModeNames[mode] ?? mode).join(" & ")}
                   </dd>
                 </div>
               </dl>
@@ -370,9 +360,7 @@ export function ProgramDetailPage() {
                 <div>
                   <h2>Tổng quan</h2>
                   <p>
-                    Chương trình tập trung vào năng lực thực hành, giúp học viên
-                    vận dụng hiệu quả nghiệp vụ công đoàn trong môi trường giáo
-                    dục.
+                    {program.description}
                   </p>
                 </div>
               </article>
@@ -407,8 +395,7 @@ export function ProgramDetailPage() {
               )}
               {activeTab === "Đối tượng" && (
                 <p>
-                  Chương trình dành cho cán bộ công đoàn, công chức, viên chức,
-                  giáo viên và cán bộ quản lý trong ngành giáo dục.
+                  {program.audience}
                 </p>
               )}
               {activeTab === "Cách đăng ký" && (
@@ -433,6 +420,8 @@ export function ProgramRegistrationPage() {
     programNames[requestedProgram] ? requestedProgram : "union",
   );
   const [studyMode, setStudyMode] = useState("online");
+  const [submitError, setSubmitError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   return (
     <>
       <PageHero
@@ -445,19 +434,27 @@ export function ProgramRegistrationPage() {
         <div className="container wizard-layout">
           <form
             className="wizard-card"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
               const form = new FormData(event.currentTarget);
-              createRegistration({
-                program: selectedProgram,
-                studyMode,
-                name: String(form.get("name") ?? "").trim(),
-                phone: String(form.get("phone") ?? "").trim(),
-                email: String(form.get("email") ?? "").trim(),
-                organization: String(form.get("organization") ?? "").trim(),
-                position: String(form.get("position") ?? "").trim(),
-              });
-              navigate("/dang-ky-thanh-cong");
+              setSubmitting(true);
+              setSubmitError("");
+              try {
+                await createRegistration({
+                  program: selectedProgram,
+                  studyMode,
+                  name: String(form.get("name") ?? "").trim(),
+                  phone: String(form.get("phone") ?? "").trim(),
+                  email: String(form.get("email") ?? "").trim(),
+                  organization: String(form.get("organization") ?? "").trim(),
+                  position: String(form.get("position") ?? "").trim(),
+                });
+                navigate("/dang-ky-thanh-cong");
+              } catch (error) {
+                setSubmitError(error instanceof Error ? error.message : "Không thể gửi đăng ký.");
+              } finally {
+                setSubmitting(false);
+              }
             }}
           >
             <Steps />
@@ -547,10 +544,11 @@ export function ProgramRegistrationPage() {
                 Tôi đồng ý để nhà trường sử dụng thông tin cho công tác tuyển
                 sinh.
               </label>
-              <button className="wizard-submit" type="submit">
-                Tiếp tục
+              <button className="wizard-submit" disabled={submitting} type="submit">
+                {submitting ? "Đang gửi..." : "Tiếp tục"}
               </button>
             </div>
+            {submitError && <p className="form-error" role="alert">{submitError}</p>}
           </form>
           <aside className="registration-summary">
             <h2>Thông tin đăng ký</h2>
@@ -596,8 +594,10 @@ export function ProgramRegistrationPage() {
 }
 
 export function RegistrationSuccessPage() {
-  const registration = getLastRegistration();
-  if (!registration) {
+  const [registration, setRegistration] = useState<RegistrationRecord | null>();
+  useEffect(() => { void getLastRegistration().then((value) => setRegistration(value ?? null)).catch(() => setRegistration(null)); }, []);
+  if (registration === undefined) return <section className="lookup-section"><div className="container lookup-not-found"><p>Đang tải thông tin đăng ký...</p></div></section>;
+  if (registration === null) {
     return (
       <>
         <PageHero title="Chưa có đăng ký" current="Đăng ký chương trình" />
@@ -663,19 +663,20 @@ export function RegistrationSuccessPage() {
 
 export function ApplicationFormPage() {
   const navigate = useNavigate();
-  const registration = getLastRegistration();
+  const registrationReference = getLastRegistrationReference();
   const documentLabels = [
     "Phiếu đăng ký",
     "Văn bằng hoặc chứng chỉ",
     "Giấy tờ tùy thân",
   ];
-  const [uploadedDocuments, setUploadedDocuments] = useState<(string | null)[]>(
+  const [uploadedDocuments, setUploadedDocuments] = useState<(File | null)[]>(
     [null, null, null],
   );
   const [uploadError, setUploadError] = useState("");
   const [applicantPhone, setApplicantPhone] = useState(
-    registration?.phone ?? "",
+    registrationReference?.phone ?? "",
   );
+  const [submitting, setSubmitting] = useState(false);
   const completedDocuments = uploadedDocuments.filter(Boolean).length;
 
   return (
@@ -690,7 +691,7 @@ export function ApplicationFormPage() {
         <div className="container wizard-layout application-layout">
           <form
             className="wizard-card application-wizard"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
               if (completedDocuments !== documentLabels.length) {
                 setUploadError(
@@ -698,13 +699,19 @@ export function ApplicationFormPage() {
                 );
                 return;
               }
-              const application = createApplication(
-                uploadedDocuments.filter((file): file is string =>
-                  Boolean(file),
-                ),
-                applicantPhone,
-              );
-              navigate(`/ho-so/${application.code}`);
+              setSubmitting(true);
+              try {
+                const application = await createApplication(
+                  uploadedDocuments.filter((file): file is File => Boolean(file)),
+                  applicantPhone,
+                  registrationReference?.code,
+                );
+                navigate(`/ho-so/${application.code}`);
+              } catch (error) {
+                setUploadError(error instanceof Error ? error.message : "Không thể gửi hồ sơ.");
+              } finally {
+                setSubmitting(false);
+              }
             }}
           >
             <Steps active={2} labels={["Thông tin", "Tài hồ sơ", "Xác nhận"]} />
@@ -734,7 +741,7 @@ export function ApplicationFormPage() {
                   {file ? (
                     <div className="uploaded-file">
                       <FileText />
-                      <span>{file}</span>
+                      <span>{file.name}</span>
                       <b>Đã tải lên</b>
                       <CheckCircle2 />
                       <button
@@ -769,7 +776,7 @@ export function ApplicationFormPage() {
                           setUploadError("");
                           setUploadedDocuments((current) =>
                             current.map((item, itemIndex) =>
-                              itemIndex === index ? selectedFile.name : item,
+                              itemIndex === index ? selectedFile : item,
                             ),
                           );
                         }}
@@ -792,8 +799,8 @@ export function ApplicationFormPage() {
                 <ArrowLeft />
                 Quay lại
               </button>
-              <button className="wizard-submit" type="submit">
-                Tiếp tục <ArrowRight />
+              <button className="wizard-submit" disabled={submitting} type="submit">
+                {submitting ? "Đang gửi..." : "Tiếp tục"} <ArrowRight />
               </button>
             </div>
           </form>
@@ -852,9 +859,9 @@ export function ApplicationLookupPage() {
         <div className="container">
           <div className="lookup-card">
             <form
-              onSubmit={(event) => {
+              onSubmit={async (event) => {
                 event.preventDefault();
-                const application = findApplication(lookupCode, lookupPhone);
+                const application = await findApplication(lookupCode, lookupPhone);
                 if (!application) {
                   setLookupError(
                     "Không tìm thấy hồ sơ khớp với mã và số điện thoại đã nhập.",
@@ -862,6 +869,7 @@ export function ApplicationLookupPage() {
                   return;
                 }
                 setLookupError("");
+                sessionStorage.setItem("cdgd.last-application", JSON.stringify({ code: application.code, phone: lookupPhone }));
                 navigate(`/ho-so/${application.code}`);
               }}
             >
@@ -943,8 +951,14 @@ export function ApplicationLookupPage() {
 
 export function ApplicationStatusPage() {
   const { code } = useParams();
-  const application = code ? findApplication(code) : undefined;
-  if (!application) {
+  const reference = getLastApplicationReference();
+  const [application, setApplication] = useState<ApplicationRecord | null>();
+  useEffect(() => {
+    if (!code || !reference?.phone) { setApplication(null); return; }
+    void findApplication(code, reference.phone).then((value) => setApplication(value ?? null)).catch(() => setApplication(null));
+  }, [code, reference?.phone]);
+  if (application === undefined) return <section className="lookup-section"><div className="container lookup-not-found"><p>Đang tải trạng thái hồ sơ...</p></div></section>;
+  if (application === null) {
     return (
       <>
         <PageHero
@@ -970,7 +984,6 @@ export function ApplicationStatusPage() {
       : application.status === "reviewing"
         ? 3
         : 1;
-  const registration = findRegistration(application.registrationCode);
   return (
     <>
       <PageHero
@@ -1064,17 +1077,17 @@ export function ApplicationStatusPage() {
                 [
                   GraduationCap,
                   "Chương trình:",
-                  programNames[registration?.program ?? "union"],
+                  application.programTitle ?? programNames[application.program ?? "union"],
                 ],
                 [
                   MonitorUp,
                   "Hình thức:",
-                  studyModeNames[registration?.studyMode ?? "online"],
+                  "Theo đăng ký đã gửi",
                 ],
                 [
                   UserRound,
                   "Người đăng ký:",
-                  registration?.name ?? "Chưa cập nhật",
+                  application.applicantName ?? "Chưa cập nhật",
                 ],
                 [
                   FolderOpen,

@@ -1,22 +1,42 @@
 # Production readiness
 
-## Đã hoàn thiện trong frontend
+## Kiến trúc hiện tại
 
-- Đăng ký chương trình có validation, sinh mã và hiển thị đúng dữ liệu đã nhập.
-- Nộp hồ sơ bắt đầu từ trạng thái trống, kiểm tra loại tệp/số lượng/kích thước và sinh mã hồ sơ.
-- Tra cứu xác minh đồng thời mã hồ sơ và số điện thoại.
-- Thi thử có ngân hàng câu hỏi theo từng đề, đồng hồ, chấm điểm và xem lại đáp án theo bài làm.
-- Tìm kiếm, lọc, sắp xếp, phân trang và các route public hoạt động.
-- Route không hợp lệ có empty/error state thay vì hiển thị dữ liệu mẫu.
+- Frontend React/Vite nằm trong repository này.
+- Backend TypeScript/Fastify nằm ở thư mục sibling `../congdoanldp-backend`.
+- PostgreSQL lưu chương trình, đăng ký, hồ sơ, tài liệu, đề thi, câu hỏi, kết quả, tin tức, media, cấu hình, người dùng và audit log.
+- Frontend gọi backend qua `VITE_API_URL`; môi trường local dùng Vite proxy `/api`.
 
-## Bắt buộc trước khi vận hành đa người dùng
+## Luồng đã chạy bằng dữ liệu thật
 
-- API và cơ sở dữ liệu cho đăng ký, hồ sơ, trạng thái xử lý và kết quả thi.
-- Object storage và cơ chế quét tệp cho tài liệu tải lên.
-- Xác thực, phân quyền và audit log cho CMS.
-- Kết nối email/SMS để gửi mã và thông báo trạng thái.
-- Nội dung pháp lý chính thức được đơn vị phụ trách phê duyệt.
+- Danh sách/chi tiết chương trình và tin tức được đọc từ API.
+- Đăng ký chương trình được validate và ghi PostgreSQL.
+- Hồ sơ tải đủ ba tài liệu; server kiểm tra MIME/dung lượng và lưu dữ liệu tệp.
+- Tra cứu bắt buộc khớp mã hồ sơ và số điện thoại.
+- Ngân hàng đề/câu hỏi được đọc từ DB; bài thi được chấm và lưu phía server.
+- CMS có đăng nhập JWT, dashboard, danh sách, chi tiết, cập nhật trạng thái, CRUD nội dung, media, cấu hình và audit log.
+- Trình duyệt chỉ lưu visitor ID, token/mã phiên; không còn lưu bản ghi nghiệp vụ trong `localStorage`.
 
-Trong kiến trúc Vite hiện tại, dữ liệu hành trình public được lưu cục bộ trong
-`localStorage` của trình duyệt để các luồng hoạt động xuyên trang. Dữ liệu này
-không đồng bộ giữa thiết bị và không thay thế backend production.
+## Cấu hình triển khai
+
+Frontend:
+
+```env
+VITE_API_URL=https://api.example.vn/api
+```
+
+Backend: sao chép `../congdoanldp-backend/.env.example`, đặt secret thực và chạy:
+
+```bash
+pnpm db:migrate
+pnpm db:seed
+pnpm start
+```
+
+## Khuyến nghị trước khi mở public
+
+- Đổi mật khẩu quản trị seed và JWT secret trên môi trường production.
+- Dùng HTTPS cho cả frontend/API và giới hạn `PUBLIC_APP_URL` đúng domain frontend.
+- Bật backup PostgreSQL định kỳ và retention phù hợp.
+- Với lưu lượng lớn, chuyển file hồ sơ/media sang object storage có quét malware; schema hiện lưu `BYTEA` vì đầu vào chỉ cung cấp PostgreSQL.
+- Kết nối SMTP/SMS nếu cần gửi thông báo tự động.
