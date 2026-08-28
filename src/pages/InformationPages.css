@@ -7,10 +7,10 @@
 }
 .info-crumb a,
 .info-crumb b {
-  color: #0758cf;
+  color: #0b93c9;
 }
 .info-kicker {
-  color: #0758cf;
+  color: #0b93c9;
   font-weight: 700;
 }
 .info-kicker:before {
@@ -80,7 +80,7 @@
   height: 76px;
   border-radius: 50%;
   background: #edf6ff;
-  color: #0758cf;
+  color: #0b93c9;
   display: grid;
   place-content: center;
   flex: none;
@@ -91,7 +91,7 @@
 .about-cards h2,
 .unit-card h2 {
   font-size: 22px;
-  color: #0758cf;
+  color: #0b93c9;
   margin: 0 0 6px;
 }
 .about-cards p {
@@ -126,7 +126,7 @@
 .unit-card a,
 .detail-cta a {
   height: 54px;
-  background: #0758cf;
+  background: #0b93c9;
   color: #fff;
   border-radius: 8px;
   display: flex;
@@ -215,7 +215,7 @@
 }
 .featured-strip small,
 .news-cards small {
-  color: #0758cf;
+  color: #0b93c9;
 }
 .featured-strip h2 {
   font-size: 1.45rem;
@@ -264,14 +264,14 @@
 .news-tools button {
   min-width: 128px;
   background: #fff;
-  border: 1px solid #075edb;
-  color: #0758cf;
+  border: 1px solid #159fda;
+  color: #0b93c9;
   border-radius: 7px;
   padding: 10px 24px;
   cursor: pointer;
 }
 .news-tools .active {
-  background: #0758cf;
+  background: #0b93c9;
   color: #fff;
 }
 .news-cards {
@@ -319,7 +319,7 @@
 }
 .news-cards a {
   margin-top: auto;
-  color: #0758cf;
+  color: #0b93c9;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -336,16 +336,16 @@
   align-items: center;
   justify-content: center;
   background: #fff;
-  color: #0758cf;
+  color: #0b93c9;
   padding: 9px 18px;
-  border: 1px solid #075edb;
+  border: 1px solid #159fda;
   border-radius: 6px;
   display: flex;
   gap: 8px;
   cursor: pointer;
 }
 .news-pages .active {
-  background: #0758cf;
+  background: #0b93c9;
   color: #fff;
 }
 .news-pages button:disabled {
@@ -383,7 +383,7 @@
 }
 .detail-grid main h2 {
   font-size: 1.45rem;
-  color: #0758cf;
+  color: #0b93c9;
   margin: 18px 0 4px;
 }
 .detail-grid main p {
@@ -404,7 +404,7 @@
   padding: 22px;
 }
 .detail-grid aside h2 {
-  color: #0758cf;
+  color: #0b93c9;
   margin: 0 0 8px;
 }
 .detail-grid aside a {
@@ -414,7 +414,7 @@
   gap: 15px;
   padding: 20px 0;
   border-bottom: 1px solid #e0e5ec;
-  color: #0758cf;
+  color: #0b93c9;
 }
 .detail-grid aside a:last-child {
   border: 0;
@@ -444,7 +444,7 @@
 }
 .detail-cta span {
   font-size: 1.35rem;
-  color: #0758cf;
+  color: #0b93c9;
   font-weight: 700;
 }
 .detail-cta a {
