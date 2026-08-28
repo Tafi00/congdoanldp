@@ -17,36 +17,57 @@ const heroSlides = [
   {
     image: assets.heroEvent01,
     label: "Khởi động hoạt động đào tạo",
+    title: ["Bồi dưỡng năng lực", "Vững bước sự nghiệp giáo dục"],
+    description:
+      "Nâng cao chuyên môn, nghiệp vụ công đoàn, sư phạm và quản lý giáo dục cho đội ngũ cán bộ, giáo viên trên toàn quốc.",
     alt: "Cán bộ phát biểu tại lễ khởi động hoạt động đào tạo",
   },
   {
     image: assets.heroEvent02,
     label: "Đồng hành cùng đội ngũ",
+    title: ["Đồng hành cùng đội ngũ", "kiến tạo tương lai giáo dục"],
+    description:
+      "Tạo không gian học tập thực tiễn, nơi mỗi cán bộ được tiếp thêm năng lực và cảm hứng để phát triển nghề nghiệp.",
     alt: "Cán bộ giáo dục phát biểu tại sự kiện",
   },
   {
     image: assets.heroEvent03,
     label: "Kết nối cộng đồng giáo dục",
+    title: ["Kết nối tri thức", "lan tỏa giá trị giáo dục"],
+    description:
+      "Gắn kết cán bộ, giảng viên và các đơn vị giáo dục để chia sẻ kinh nghiệm, cùng nâng cao chất lượng đội ngũ.",
     alt: "Đại biểu tham dự chương trình đào tạo",
   },
   {
     image: assets.heroEvent04,
     label: "Chia sẻ tri thức thực tiễn",
+    title: ["Từ thực tiễn", "đến năng lực dẫn dắt"],
+    description:
+      "Các chương trình bồi dưỡng được thiết kế sát với công việc, giúp người học tự tin ứng dụng ngay trong đơn vị.",
     alt: "Hai cán bộ ký kết thỏa thuận tại chương trình",
   },
   {
     image: assets.heroEvent05,
     label: "Vững bước sự nghiệp giáo dục",
+    title: ["Trao cơ hội học tập", "mở rộng hướng phát triển"],
+    description:
+      "Linh hoạt về nội dung và hình thức, đồng hành cùng cán bộ công đoàn, giáo viên và cán bộ quản lý trên cả nước.",
     alt: "Đại diện chương trình trao quyết định",
   },
   {
     image: assets.heroEvent06,
     label: "Lan tỏa tinh thần học tập",
+    title: ["Đổi mới để thích ứng", "với yêu cầu mới"],
+    description:
+      "Cập nhật phương pháp, công nghệ và tư duy quản trị để đội ngũ giáo dục luôn sẵn sàng trước những chuyển động mới.",
     alt: "Đại biểu trao đổi trong lễ khởi động",
   },
   {
     image: assets.heroEvent07,
     label: "Cùng nhau phát triển",
+    title: ["Gắn kết đội ngũ", "nâng tầm nhà trường"],
+    description:
+      "Cùng xây dựng một cộng đồng giáo dục đoàn kết, chuyên nghiệp và bền vững từ nền tảng gần 50 năm phát triển.",
     alt: "Tập thể cán bộ giáo dục chụp ảnh lưu niệm",
   },
 ] as const;
@@ -111,12 +132,11 @@ export function HeroSection() {
           </motion.p>
 
           <motion.h1 id="hero-title" className="display hero__title" variants={fadeUp}>
-            Bồi dưỡng năng lực –<br /> Vững bước sự nghiệp giáo dục
+            {activeSlide.title[0]} <br /> {activeSlide.title[1]}
           </motion.h1>
 
           <motion.p className="lead hero__description" variants={fadeUp}>
-            Nâng cao chuyên môn, nghiệp vụ công đoàn, sư phạm và quản lý giáo dục
-            cho đội ngũ cán bộ, giáo viên trên toàn quốc.
+            {activeSlide.description}
           </motion.p>
 
           <motion.div className="hero__actions" variants={fadeUp}>
