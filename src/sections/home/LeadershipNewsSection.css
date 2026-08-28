@@ -58,9 +58,10 @@
 }
 
 .leadership-news__meta {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
+  width: fit-content;
   margin-top: 25px;
   color: var(--color-ink-soft);
   font-size: 0.84rem;
@@ -72,10 +73,11 @@
 }
 
 .leadership-news__link {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 25px;
+  width: fit-content;
+  margin-top: 14px;
   padding-bottom: 5px;
   border-bottom: 2px solid var(--color-accent-500);
   color: var(--color-primary-700);
