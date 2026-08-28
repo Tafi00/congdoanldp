@@ -10,7 +10,9 @@ export function HomeCtaSection() {
     <section className="home-cta">
       <motion.div
         className="container home-cta__panel"
-        style={{ backgroundImage: `url(${assets.ctaBannerBackground})` }}
+        style={{
+          backgroundImage: `linear-gradient(105deg, rgba(6, 58, 90, 0.46), rgba(7, 82, 116, 0.3)), url(${assets.ctaBannerBackground})`,
+        }}
         initial="hidden"
         whileInView="visible"
         viewport={viewportOnce}

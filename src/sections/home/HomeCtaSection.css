@@ -15,7 +15,7 @@
   background-color: var(--color-primary-900);
   background-position: center;
   background-size: cover;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 16px 40px rgb(6 58 90 / 14%);
   color: #fff;
 }
 .home-cta__icon {
